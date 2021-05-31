@@ -138,6 +138,9 @@ void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _s
 		glActiveTexture(GL_TEXTURE0); //Activamos la textura antes de bindearla
 		glBindTexture(GL_TEXTURE_2D, texture); //Bindeamos la texztura (empezamos a acceder a la información de la textura)
 	}
+	else {
+
+	}
 
 	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(_pos[0], _pos[1], _pos[2]));
 	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(_rotation), glm::vec3(_axisRotation[0], _axisRotation[1], _axisRotation[2]));
@@ -158,6 +161,32 @@ void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _s
 	ourShader.setVec4("specularIntensity", _specularIntensity, _specularIntensity, _specularIntensity, _specularIntensity);
 	ourShader.setFloat("specularDensity", _specularDensity);
 	ourShader.setFloat("lightSelection", _lightSelection);
+	ourShader.setVec3("randomizedVec", randomizedVec.x, randomizedVec.y, randomizedVec.z);
+	ourShader.setFloat("time", ImGui::GetTime());
+
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+	glUseProgram(0);
+	glBindVertexArray(0);
+}
+
+void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], unsigned int _framebuffer, glm::mat4 _modelView, glm::mat4 _MVP) {
+	glBindVertexArray(objectVao);
+
+	ourShader.use(); //Activamos el shader antes de configurar los uniforms
+
+
+	glActiveTexture(GL_TEXTURE0); //Activamos la textura antes de bindearla
+	glBindTexture(GL_TEXTURE_2D, _framebuffer); //Bindeamos la texztura (empezamos a acceder a la información de la textura)
+
+	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(_pos[0], _pos[1], _pos[2]));
+	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(_rotation), glm::vec3(_axisRotation[0], _axisRotation[1], _axisRotation[2]));
+	glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(_scale[0], _scale[1], _scale[2]));
+	objMat = t * r * s;
+
+	ourShader.setMat4("objMat", objMat);
+	ourShader.setMat4("mv_Mat", _modelView);
+	ourShader.setMat4("mvpMat", _MVP);
 	ourShader.setVec3("randomizedVec", randomizedVec.x, randomizedVec.y, randomizedVec.z);
 	ourShader.setFloat("time", ImGui::GetTime());
 

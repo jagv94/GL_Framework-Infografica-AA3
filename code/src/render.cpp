@@ -273,10 +273,10 @@ void GLinit(int width, int height) {
 	//billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
 	toonShader = Shader("shaders/texturedVertex.vs", "shaders/toon.fs");
 
-	//bmw = Object("resources/BMWX5.obj", "resources/metal.jpg", true, texturedShader);
-	//mesa = Object("resources/mesa.obj", "resources/mesaColor.png", true, toonShader);
-	bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
-	mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
+	bmw = Object("resources/BMWX5.obj", "resources/metal.jpg", true, texturedShader);
+	mesa = Object("resources/mesa.obj", "resources/mesaColor.png", true, toonShader);
+	//bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
+	//mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
 	//cube = Object("resources/cube.obj", "resources/checker.jpg", true, texturedShader);
 	cube = Object("resources/cube.obj", fboTex, texturedShader);
 
@@ -346,8 +346,7 @@ void GLrender(float dt) {
 	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
 		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
 
-	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, cube.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
 
 	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
 
@@ -382,8 +381,7 @@ void GLrender(float dt) {
 	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
 		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
 
-	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, cube.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
 
 	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
 

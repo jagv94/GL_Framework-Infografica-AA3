@@ -51,7 +51,7 @@ public:
 	void draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], float _color[], float _ambientColor[], float _ambientIntensity, float _difuseIntensity,
 		float _difuseColor[], float _lightDirection[], float _pointPos[], float _specularColor[], float _specularIntensity,
 		int _specularDesity, int _lightSelection, glm::mat4 _modelView, glm::mat4 _MVP);
-	void setupFBO();
+	void draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], unsigned int _framebuffer, glm::mat4 _modelView, glm::mat4 _MVP);
 	void update(const glm::mat4& transform);
 	void cleanup();
 };
