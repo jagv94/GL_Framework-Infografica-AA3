@@ -6,8 +6,8 @@
 #include "../stb_image.h"
 
 #pragma region Variables
-Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader;
-Object mesa, bmw, cube;
+Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind;
+Object mesa, camaro, cube;
 //Billboard billboard;
 Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebuffer, devolver los datos a la variable _framebuffer
 unsigned int fbo;
@@ -269,11 +269,12 @@ void GLinit(int width, int height) {
 	framebuffer = Framebuffer(fbo, fboTex);
 	//texturedExplosionShader = Shader("shaders/vertexExplosion.vs", "shaders/texturedFragment.fs", "shaders/explosionGeometry.gs");
 	texturedShader = Shader("shaders/texturedVertex.vs", "shaders/texturedFragment.fs");
+	texturedShaderNoWind = Shader("shaders/texturedVertex.vs", "shaders/texturedFragmentDiscardWind.fs");
 	nonTexturedShader = Shader("shaders/vertex.vs", "shaders/fragment.fs");
 	//billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
 	toonShader = Shader("shaders/texturedVertex.vs", "shaders/toon.fs");
 
-	bmw = Object("resources/BMWX5.obj", "resources/metal.jpg", true, texturedShader);
+	camaro = Object("resources/Camaro.obj", "resources/Camaro_AlbedoTransparency_alt.png", true, texturedShaderNoWind);
 	mesa = Object("resources/mesa.obj", "resources/mesaColor.png", true, toonShader);
 	//bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
 	//mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
@@ -284,12 +285,12 @@ void GLinit(int width, int height) {
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	bmw.pos[0] = 20.f;
-	bmw.pos[1] = 40.f;
-	bmw.pos[2] = -12.f;
-	bmw.scale[0] = 0.3f;
-	bmw.scale[1] = 0.3f;
-	bmw.scale[2] = 0.3f;
+	camaro.pos[0] = 20.f;
+	camaro.pos[1] = 40.f;
+	camaro.pos[2] = -12.f;
+	camaro.scale[0] = 0.3f;
+	camaro.scale[1] = 0.3f;
+	camaro.scale[2] = 0.3f;
 	/*billboard.pos[0] = -15.f;
 	billboard.pos[1] = 50.f;*/
 	cube.pos[0] = -20.f;
@@ -308,7 +309,7 @@ void GLcleanup() {
 	/////////////////////////////////////////////////////TODO
 	// Do your cleanup code here
 
-	bmw.cleanup();
+	camaro.cleanup();
 	mesa.cleanup();
 	cube.cleanup();
 	//billboard.cleanup();
@@ -340,7 +341,7 @@ void GLrender(float dt) {
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
-	bmw.draw(bmw.pos, bmw.rotation, bmw.axisRotation, bmw.scale, bmw.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
+	camaro.draw(camaro.pos, camaro.rotation, camaro.axisRotation, camaro.scale, camaro.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
 		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
 
 	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
@@ -375,7 +376,7 @@ void GLrender(float dt) {
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
-	bmw.draw(bmw.pos, bmw.rotation, bmw.axisRotation, bmw.scale, bmw.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
+	camaro.draw(camaro.pos, camaro.rotation, camaro.axisRotation, camaro.scale, camaro.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
 		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
 
 	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
@@ -440,11 +441,11 @@ void GUI() {
 
 		if (ImGui::CollapsingHeader("BMW")) {
 			ImGui::Indent();
-			ImGui::ColorEdit4("Color BMW", bmw.color);
-			ImGui::DragFloat3("Posicion BMW", bmw.pos, 0.5f, -150, 150);
-			ImGui::DragFloat3("Eje de rotacion BMW", bmw.axisRotation, 1.f, 0.f, 1.f);
-			ImGui::DragFloat("Rotacion BMW", &bmw.rotation, 0.5f, -180, 180);
-			ImGui::DragFloat3("Escala BMW", bmw.scale, 0.1f, -100, 100);
+			ImGui::ColorEdit4("Color BMW", camaro.color);
+			ImGui::DragFloat3("Posicion BMW", camaro.pos, 0.5f, -150, 150);
+			ImGui::DragFloat3("Eje de rotacion BMW", camaro.axisRotation, 1.f, 0.f, 1.f);
+			ImGui::DragFloat("Rotacion BMW", &camaro.rotation, 0.5f, -180, 180);
+			ImGui::DragFloat3("Escala BMW", camaro.scale, 0.1f, -100, 100);
 			ImGui::Unindent();
 		}
 
