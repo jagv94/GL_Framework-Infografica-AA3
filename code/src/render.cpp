@@ -13,7 +13,7 @@ Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebu
 unsigned int fbo;
 unsigned int fboTex;
 
-int gWidth, gHeight; //Variables globales del aancho y alto de la pantalla
+int gWidth, gHeight; //Variables globales del ancho y alto de la pantalla
 float ambientColor[4] = { 1.f, 1.f, 1.f, 1.f }; //Color de la luz ambiente
 float ambientIntensity = 0.5f; //Intensidad de la luz ambiente
 float difuseIntensity = 0.5f; //Intensidad de la luz difusa
@@ -67,6 +67,7 @@ void GLResize(int width, int height) {
 	glViewport(0, 0, width, height);
 	if (height != 0) RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
 	else RV::_projection = glm::perspective(glm::radians(fov), 0.f, RV::zNear, RV::zFar * 100);
+
 }
 
 void GLmousecb(MouseEvent ev) {
@@ -325,7 +326,7 @@ void GLrender(float dt) {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//////////
-	RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
+	//RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
 
 	//En la transformación y rotación del model view para la cámara, útilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la cámara desde la interfaz de ser necesario.
 	RV::_modelView = glm::mat4(1.f);
@@ -360,7 +361,7 @@ void GLrender(float dt) {
 #pragma region ClassicRender
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
+	//RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
 
 	//En la transformación y rotación del model view para la cámara, útilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la cámara desde la interfaz de ser necesario.
 	RV::_modelView = glm::mat4(1.f);
