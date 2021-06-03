@@ -19,6 +19,7 @@
 	uniform int lightSelection; //Selector del tipo de iluminacion (direccional o point)
 	uniform sampler2D ourTexture;
 	vec4 posCamera; //Posición de la camara
+	vec4 resultOfAll;
 	vec3 result; //Resultado de las operaciones
 	void main() {
 		switch(lightSelection){ //Switch para la selección de iluminación
@@ -46,11 +47,7 @@
 		//Sumamos las anteriores operaciones y finalmente multiplicamos por el color original del objeto
 		result = vec3((ambient + diffuse + specular) * objectColor);
 		out_Color = vec4(result, 1.0);
-		FragColor = texture(ourTexture, TexCoord) * out_Color;
+		resultOfAll = texture(ourTexture, TexCoord) * out_Color;
 		
-		if(mod(FragColor.x, 2) > 0.5f && mod(FragColor.y, 2) > 0.5f)
-        {
-            discard;
-        }
-		
+		FragColor = vec4(resultOfAll.x,resultOfAll.y, resultOfAll.z, 0.5f);
 	}

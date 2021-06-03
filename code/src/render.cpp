@@ -400,6 +400,8 @@ void GLrender(float dt) {
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	camaro2.draw(camaro.pos, camaro.rotation, camaro.axisRotation, camaro.scale, camaro.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
 		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
 
@@ -408,7 +410,7 @@ void GLrender(float dt) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
-
+	glDisable(GL_BLEND);
 	
 
 	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
