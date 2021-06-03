@@ -256,7 +256,7 @@ void GLinit(int width, int height) {
 	glClearDepth(1.f);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
+	//glEnable(GL_STENCIL_TEST);
 	//glEnable(GL_CULL_FACE);
 
 	RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
@@ -363,6 +363,8 @@ void GLrender(float dt) {
 #pragma endregion
 
 #pragma region ClassicRender
+	
+	glStencilMask(0xFF);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
@@ -380,6 +382,12 @@ void GLrender(float dt) {
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
+	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
+		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+
+	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
+
+	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0xFF);
@@ -399,11 +407,9 @@ void GLrender(float dt) {
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_STENCIL_TEST);
 
-	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
-
-	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
+	
 
 	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
 

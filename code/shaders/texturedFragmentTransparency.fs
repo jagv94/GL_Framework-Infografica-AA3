@@ -46,11 +46,11 @@
 		//Sumamos las anteriores operaciones y finalmente multiplicamos por el color original del objeto
 		result = vec3((ambient + diffuse + specular) * objectColor);
 		out_Color = vec4(result, 1.0);
-		FragColor = texture(ourTexture, TexCoord) /* out_Color*/;
+		FragColor = texture(ourTexture, TexCoord) * out_Color;
 		
-		/*if(mod(FragColor.x, 2) > 0.5f && mod(FragColor.y, 2) > 0.5f)
+		if(mod(FragColor.x, 2) > 0.5f && mod(FragColor.y, 2) > 0.5f)
         {
             discard;
-        }*/
+        }
 		
 	}
