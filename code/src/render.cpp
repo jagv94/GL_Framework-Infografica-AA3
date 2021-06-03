@@ -1,18 +1,32 @@
+#include <glm/gtc/random.hpp>
 #include <../Object.h>
 #include "../Billboard.h"
 #include "../Framebuffer.h"
-#include <glm/gtc/random.hpp>
+#include "../TextureManager.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "../stb_image.h"
 
 #pragma region Variables
+//Texturas
+TextureManager metalTex;
+TextureManager mesaTex;
+
+//Shaders
 Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader;
+
+//Objetos
 Object mesa, bmw, cube;
+
+//Billboards
 //Billboard billboard;
+
+//Framebuffers
 Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebuffer, devolver los datos a la variable _framebuffer
 unsigned int fbo;
 unsigned int fboTex;
 
+//ImGui & other variables
 int gWidth, gHeight; //Variables globales del ancho y alto de la pantalla
 float ambientColor[4] = { 1.f, 1.f, 1.f, 1.f }; //Color de la luz ambiente
 float ambientIntensity = 0.5f; //Intensidad de la luz ambiente
@@ -267,15 +281,23 @@ void GLinit(int width, int height) {
 	/////////////////////////////////////////////////////TODO
 	// Do your init code here
 
+	//Preparamos las texturas
+	metalTex = TextureManager("resources/metal.jpg", true);
+	mesaTex = TextureManager("resources/mesaColor.png", true);
+
+	//Preparamos el framebuffer
 	framebuffer = Framebuffer(fbo, fboTex);
+
+	//Preparamos los shaders
 	//texturedExplosionShader = Shader("shaders/vertexExplosion.vs", "shaders/texturedFragment.fs", "shaders/explosionGeometry.gs");
 	texturedShader = Shader("shaders/texturedVertex.vs", "shaders/texturedFragment.fs");
 	nonTexturedShader = Shader("shaders/vertex.vs", "shaders/fragment.fs");
 	//billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
 	toonShader = Shader("shaders/texturedVertex.vs", "shaders/toon.fs");
 
-	bmw = Object("resources/BMWX5.obj", "resources/metal.jpg", true, texturedShader);
-	mesa = Object("resources/mesa.obj", "resources/mesaColor.png", true, toonShader);
+	//Preparamos los objetos a utilizar
+	bmw = Object("resources/BMWX5.obj", metalTex.GetImg(), texturedShader);
+	mesa = Object("resources/mesa.obj", mesaTex.GetImg(), toonShader);
 	//bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
 	//mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
 	//cube = Object("resources/cube.obj", "resources/checker.jpg", true, texturedShader);

@@ -1,11 +1,9 @@
 #include "Billboard.h"
-#include "stb_image.h"
 
 extern void linkProgram(GLuint program);
 
 Billboard::Billboard() {}
-
-Billboard::Billboard(const char* _texturePath, bool _flip, Shader _shader) : texturePath(_texturePath), flip(_flip), ourShader(_shader)
+Billboard::Billboard(unsigned int _texture, Shader _shader) : texture(_texture), ourShader(_shader)
 {
 	//Cargamos el objeto
 	vertices.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -20,27 +18,6 @@ Billboard::Billboard(const char* _texturePath, bool _flip, Shader _shader) : tex
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
-
-	glGenTextures(1, &texture); //Cargamos en gráfica y accedemos a la variable que contendrá la textura
-	glBindTexture(GL_TEXTURE_2D, texture); //Bindeamos la texztura (empezamos a acceder a la información de la textura)
-
-	stbi_set_flip_vertically_on_load(flip); //Giramos la imagen si la vemos al reves
-	data = stbi_load(texturePath, &x, &y, &n, 4); //Cargamos la textura
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		printf("Failed to load texture\n");
-	}
-
-	//Filtros de la textura
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	//Liberamos memora de la imagen de la textura aquí y en el cleanup
-	stbi_image_free(data);
 
 	//Desbindeamos el objeto de memoria
 	glBindVertexArray(0);
