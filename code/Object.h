@@ -9,6 +9,15 @@
 #include <cassert>
 #include <vector>
 
+namespace RenderVars {
+	extern glm::mat4 _projection;
+	extern glm::mat4 _modelView;
+	extern glm::mat4 _MVP;
+	extern glm::mat4 _inv_modelview;
+	extern glm::vec4 _cameraPoint;
+}
+namespace RV = RenderVars;
+
 class Object
 {
 private:
@@ -42,10 +51,10 @@ public:
 	Object();
 	Object(const char* _modelPath, unsigned int _texture, Shader _shader);
 
-	void draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], float _color[], float _ambientColor[], float _ambientIntensity, float _difuseIntensity,
+	void draw(float _color[], float _ambientColor[], float _ambientIntensity, float _difuseIntensity,
 		float _difuseColor[], float _lightDirection[], float _pointPos[], float _specularColor[], float _specularIntensity,
-		int _specularDesity, int _lightSelection, glm::mat4 _modelView, glm::mat4 _MVP);
-	void draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], unsigned int _framebuffer, glm::mat4 _modelView, glm::mat4 _MVP);
+		int _specularDesity, int _lightSelection);
+	void draw(unsigned int _framebuffer);
 	void update(const glm::mat4& transform);
 	void cleanup();
 };

@@ -367,13 +367,13 @@ void GLrender(float dt) {
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
-	bmw.draw(bmw.pos, bmw.rotation, bmw.axisRotation, bmw.scale, bmw.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	bmw.draw(bmw.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
+		specularColor, specularIntensity, specularDensity, lightSelection);
 
-	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	mesa.draw(mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
+		specularColor, specularIntensity, specularDensity, lightSelection);
 
-	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
+	cube.draw(fboTex);
 
 	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
 
@@ -402,13 +402,13 @@ void GLrender(float dt) {
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
-	bmw.draw(bmw.pos, bmw.rotation, bmw.axisRotation, bmw.scale, bmw.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	bmw.draw(bmw.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
+		specularColor, specularIntensity, specularDensity, lightSelection);
 
-	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	mesa.draw(mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
+		specularColor, specularIntensity, specularDensity, lightSelection);
 
-	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
+	cube.draw(fboTex);
 
 	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
 
