@@ -1,39 +1,54 @@
+#include <glm/gtc/random.hpp>
 #include <../Object.h>
 #include "../Billboard.h"
 #include "../Framebuffer.h"
-#include <glm/gtc/random.hpp>
+#include "../TextureManager.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "../stb_image.h"
 
 #pragma region Variables
-Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind, texturedShaderTransparency;
-Object mesa, camaro, camaro2, cube;
+//Texturas
+TextureManager metalTex;
+TextureManager mesaTex;
+
+//Shaders
+Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader;
+
+//Objetos
+Object mesa, bmw, cube, camaro, camaro2;
+
+//Billboards
 //Billboard billboard;
+
+//Framebuffers
 Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebuffer, devolver los datos a la variable _framebuffer
 unsigned int fbo;
 unsigned int fboTex;
 
-int gWidth, gHeight; //Variables globales del aancho y alto de la pantalla
+//ImGui & other variables
+int gWidth, gHeight; //Variables globales del ancho y alto de la pantalla
 float ambientColor[4] = { 1.f, 1.f, 1.f, 1.f }; //Color de la luz ambiente
 float ambientIntensity = 0.5f; //Intensidad de la luz ambiente
 float difuseIntensity = 0.5f; //Intensidad de la luz difusa
 float difuseColor[4] = { 0.5f, 0.5f, 0.5f, 0.5f }; //Color de la luz difusa
-float lightDirection[4] = { 0.0f, 0.1f, 0.0f, 0.0f }; //Dirección de la luz direccional
-float pointPos[4] = { 0.0f, 40.0f, -20.0f, 0.0f }; //Posición de la PointLight
+float lightDirection[4] = { 0.0f, 0.1f, 0.0f, 0.0f }; //Direcciï¿½n de la luz direccional
+float pointPos[4] = { 0.0f, 40.0f, -20.0f, 0.0f }; //Posiciï¿½n de la PointLight
 float specularColor[4] = { 1.0f, 0.0f, 0.0f, 0.0f }; //Color de la luz especular
 float specularIntensity = 0.5f; //Intensidad de la luz especular
 int specularDensity = 32; //Densidad de la luz especular
-float camPos[2] = { 0.0f, -31.95f }; //Posición de la cámara
-float camRot[2] = { 0.0f, 0.5f }; //Rotación de la cámara
-float zoom = 62.0f; //Posición de la cámara en el eje Z, o zoom
-float fov = 65.0f; //Campo de visión de la cámara
-static int lightSelection = 0; //Selector del tipo de iluminación (direccional o point)
+float camPos[2] = { 0.0f, -31.95f }; //Posiciï¿½n de la cï¿½mara
+float camRot[2] = { 0.0f, 0.5f }; //Rotaciï¿½n de la cï¿½mara
+float zoom = 62.0f; //Posiciï¿½n de la cï¿½mara en el eje Z, o zoom
+float fov = 65.0f; //Campo de visiï¿½n de la cï¿½mara
+static int lightSelection = 0; //Selector del tipo de iluminaciï¿½n (direccional o point)
 #pragma endregion
 
 ///////// fw decl
 namespace ImGui {
 	void Render();
 }
+
 namespace Axis {
 	void setupAxis();
 	void cleanupAxis();
@@ -233,6 +248,10 @@ void main() {\n\
 	}
 }
 
+namespace Textures {
+	std::map<const char*, unsigned char*> imgLocation;
+}
+
 GLuint program;
 GLuint VAO;
 GLuint VBO;
@@ -267,7 +286,14 @@ void GLinit(int width, int height) {
 	/////////////////////////////////////////////////////TODO
 	// Do your init code here
 
+	//Preparamos las texturas
+	metalTex = TextureManager("resources/metal.jpg", true);
+	mesaTex = TextureManager("resources/mesaColor.png", true);
+
+	//Preparamos el framebuffer
 	framebuffer = Framebuffer(fbo, fboTex);
+
+	//Preparamos los shaders
 	//texturedExplosionShader = Shader("shaders/vertexExplosion.vs", "shaders/texturedFragment.fs", "shaders/explosionGeometry.gs");
 	texturedShader = Shader("shaders/texturedVertex.vs", "shaders/texturedFragment.fs");
 	texturedShaderNoWind = Shader("shaders/texturedVertex.vs", "shaders/texturedFragmentDiscardWind.fs");
@@ -276,9 +302,11 @@ void GLinit(int width, int height) {
 	//billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
 	toonShader = Shader("shaders/texturedVertex.vs", "shaders/toon.fs");
 
-	camaro = Object("resources/Camaro.obj", "resources/Camaro_AlbedoTransparency_alt.png", true, texturedShaderNoWind);
-	camaro2 = Object("resources/Camaro.obj", "resources/Camaro_AlbedoTransparency_alt.png", true, texturedShaderTransparency);
-	mesa = Object("resources/mesa.obj", "resources/mesaColor.png", true, toonShader);
+	//Preparamos los objetos a utilizar
+	bmw = Object("resources/BMWX5.obj", metalTex.GetImg(), texturedShader);
+	mesa = Object("resources/mesa.obj", mesaTex.GetImg(), toonShader);
+	camaro = Object("resources/Camaro.obj", metalTex.GetImg(), texturedShaderNoWind);
+	camaro2 = Object("resources/Camaro.obj", metalTex.GetImg(), texturedShaderTransparency);
 	//bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
 	//mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
 	//cube = Object("resources/cube.obj", "resources/checker.jpg", true, texturedShader);
@@ -330,9 +358,9 @@ void GLrender(float dt) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glStencilMask(0x00);
 	//////////
-	RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
+	//RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
 
-	//En la transformación y rotación del model view para la cámara, útilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la cámara desde la interfaz de ser necesario.
+	//En la transformaciï¿½n y rotaciï¿½n del model view para la cï¿½mara, ï¿½tilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la cï¿½mara desde la interfaz de ser necesario.
 	RV::_modelView = glm::mat4(1.f);
 	RV::_modelView = glm::translate(RV::_modelView, glm::vec3(RV::panv[0] + camPos[0], RV::panv[1] + camPos[1], RV::panv[2] - zoom));
 	RV::_modelView = glm::rotate(RV::_modelView, RV::rota[1] + camRot[1], glm::vec3(1.f, 0.f, 0.f));
@@ -367,9 +395,9 @@ void GLrender(float dt) {
 	glStencilMask(0xFF);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
+	//RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
 
-	//En la transformación y rotación del model view para la cámara, útilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la cámara desde la interfaz de ser necesario.
+	//En la transformaciï¿½n y rotaciï¿½n del model view para la cï¿½mara, ï¿½tilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la cï¿½mara desde la interfaz de ser necesario.
 	RV::_modelView = glm::mat4(1.f);
 	RV::_modelView = glm::translate(RV::_modelView, glm::vec3(RV::panv[0] + camPos[0], RV::panv[1] + camPos[1], RV::panv[2] - zoom));
 	RV::_modelView = glm::rotate(RV::_modelView, RV::rota[1] + camRot[1], glm::vec3(1.f, 0.f, 0.f));

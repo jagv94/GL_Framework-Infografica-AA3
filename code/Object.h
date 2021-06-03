@@ -1,16 +1,13 @@
+#include "GL_framework.h"
+#include <../shader_s.h>
 #include <GL\glew.h>
 #include <glm\gtc\type_ptr.hpp>
 #include <glm\gtc\matrix_transform.hpp>
-#include <cstdio>
-#include <cassert>
-
 #include <imgui\imgui.h>
 #include <imgui\imgui_impl_sdl_gl3.h>
-
-#include "GL_framework.h"
-
+#include <cstdio>
+#include <cassert>
 #include <vector>
-#include <../shader_s.h>
 
 class Object
 {
@@ -25,8 +22,6 @@ private:
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals;
 	std::vector< glm::vec3 > objectIdx;
-	int x, y, n;
-	unsigned char* data;
 	unsigned int texture;
 	unsigned int fboTex;
 
@@ -45,8 +40,7 @@ public:
 	float scale[3]{ 1.f, 1.f, 1.f }; //Escala del objeto
 	
 	Object();
-	Object(const char* _modelPath, const char* _texturePath, bool _flip, Shader _shader);
-	Object(const char* _modelPath, unsigned int _framebuffer, Shader _shader);
+	Object(const char* _modelPath, unsigned int _texture, Shader _shader);
 
 	void draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], float _color[], float _ambientColor[], float _ambientIntensity, float _difuseIntensity,
 		float _difuseColor[], float _lightDirection[], float _pointPos[], float _specularColor[], float _specularIntensity,
