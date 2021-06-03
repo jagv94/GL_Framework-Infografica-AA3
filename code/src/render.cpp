@@ -48,6 +48,7 @@ static int lightSelection = 0; //Selector del tipo de iluminación (direccional o
 namespace ImGui {
 	void Render();
 }
+
 namespace Axis {
 	void setupAxis();
 	void cleanupAxis();
@@ -81,7 +82,6 @@ void GLResize(int width, int height) {
 	glViewport(0, 0, width, height);
 	if (height != 0) RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
 	else RV::_projection = glm::perspective(glm::radians(fov), 0.f, RV::zNear, RV::zFar * 100);
-
 }
 
 void GLmousecb(MouseEvent ev) {
@@ -246,6 +246,10 @@ void main() {\n\
 		glUseProgram(0);
 		glBindVertexArray(0);
 	}
+}
+
+namespace Textures {
+	std::map<const char*, unsigned char*> imgLocation;
 }
 
 GLuint program;
