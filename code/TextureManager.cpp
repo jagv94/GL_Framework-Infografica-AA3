@@ -7,14 +7,19 @@ TextureManager::TextureManager(const char* _texturePath, bool _fliped)
 	glBindTexture(GL_TEXTURE_2D, img); //Bindeamos la textura (empezamos a acceder a la información de la textura)
 
 	stbi_set_flip_vertically_on_load(_fliped); //Giramos la imagen si la vemos al reves
-	
-	data = stbi_load(_texturePath, &x, &y, &n, 4); //Cargamos la textura
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
+
+	if (Textures::imgLocation.find(_texturePath) == Textures::imgLocation.end()) {
+		data = stbi_load(_texturePath, &x, &y, &n, 4); //Cargamos la textura
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else printf("Failed to load texture\n");
 	}
-	else printf("Failed to load texture\n");
+	else {
+		data = Textures::imgLocation.at(_texturePath);
+	}
 
 	//Filtros de la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

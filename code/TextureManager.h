@@ -2,6 +2,11 @@
 #include <GL/glew.h>
 #include <vector>
 #include "stb_image.h"
+#include <map>
+
+namespace Textures {
+	extern std::map<const char*, unsigned char*> imgLocation;
+}
 
 class TextureManager
 {
