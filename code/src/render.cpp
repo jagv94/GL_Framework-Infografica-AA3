@@ -11,9 +11,10 @@
 //Texturas
 TextureManager metalTex;
 TextureManager mesaTex;
+TextureManager camaroTex;
 
 //Shaders
-Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader;
+Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind, texturedShaderTransparency;
 
 //Objetos
 Object mesa, bmw, cube, camaro, camaro2;
@@ -289,6 +290,7 @@ void GLinit(int width, int height) {
 	//Preparamos las texturas
 	metalTex = TextureManager("resources/metal.jpg", true);
 	mesaTex = TextureManager("resources/mesaColor.png", true);
+	camaroTex = TextureManager("resources/Camaro_AlbedoTransparency_alt.png", true);
 
 	//Preparamos el framebuffer
 	framebuffer = Framebuffer(fbo, fboTex);
@@ -305,8 +307,8 @@ void GLinit(int width, int height) {
 	//Preparamos los objetos a utilizar
 	bmw = Object("resources/BMWX5.obj", metalTex.GetImg(), texturedShader);
 	mesa = Object("resources/mesa.obj", mesaTex.GetImg(), toonShader);
-	camaro = Object("resources/Camaro.obj", metalTex.GetImg(), texturedShaderNoWind);
-	camaro2 = Object("resources/Camaro.obj", metalTex.GetImg(), texturedShaderTransparency);
+	camaro = Object("resources/Camaro.obj", camaroTex.GetImg(), texturedShaderNoWind);
+	camaro2 = Object("resources/Camaro.obj", camaroTex.GetImg(), texturedShaderTransparency);
 	//bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
 	//mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
 	//cube = Object("resources/cube.obj", "resources/checker.jpg", true, texturedShader);
