@@ -15,22 +15,18 @@
 class Billboard
 {
 private:
-	const char* texturePath;
-	bool flip = false;
 	Shader ourShader;
 
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals;
 	std::vector< glm::vec3 > objectIdx;
-	int x, y, n;
-	unsigned char* data;
-	unsigned int texture;
+	unsigned int texture = 0;
 
-	GLuint objectVao;
-	GLuint objectVbo[3]; //objectVbo[4]; //Numero de componentes que tenemos (vertices, normales, texturas (UVs), indices)
-	GLuint objectShaders[2];
-	GLuint objectProgram;
+	GLuint objectVao = 0;
+	GLuint objectVbo[3] = { 0, 0, 0 }; //objectVbo[4]; //Numero de componentes que tenemos (vertices, normales, texturas (UVs), indices)
+	GLuint objectShaders[2] = { 0, 0 };
+	GLuint objectProgram = 0;
 	glm::mat4 objMat = glm::mat4(1.f);
 
 public:
@@ -38,7 +34,7 @@ public:
 	float pos[3]{ 0.f, 0.f, 0.f }; //Posicion del billboard
 
 	Billboard();
-	Billboard(const char* _texturePath, bool _flip, Shader _shader);
+	Billboard(unsigned int _texture, Shader _shader);
 	void update(const glm::mat4& transform);
 	void draw(float _pos[], glm::mat4 _modelView, glm::mat4 _MVP);
 	void cleanup();

@@ -1,9 +1,7 @@
 #include "Framebuffer.h"
-#include <GL/glew.h>
-#include <iostream>
 
 Framebuffer::Framebuffer() {}
-Framebuffer::Framebuffer(unsigned int &_fbo, unsigned int &_fboTex) {
+Framebuffer::Framebuffer(unsigned int& _fbo, unsigned int& _fboTex) {
 	/////setup FBO texture
 	glGenFramebuffers(1, &_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
