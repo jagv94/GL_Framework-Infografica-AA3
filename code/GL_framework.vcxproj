@@ -142,6 +142,7 @@ xcopy "$(ProjectDir)libs\SDL2.dll" "$(OutDir)" /y /d</Command>
     <ClCompile Include="load_obj.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Billboard.cpp" />
+    <ClCompile Include="shader_s.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\render.cpp" />
     <ClCompile Include="TextureManager.cpp" />

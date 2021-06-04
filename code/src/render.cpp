@@ -27,22 +27,27 @@ Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebu
 unsigned int fbo;
 unsigned int fboTex;
 
-//ImGui & other variables
-int gWidth, gHeight; //Variables globales del ancho y alto de la pantalla
-float ambientColor[4] = { 1.f, 1.f, 1.f, 1.f }; //Color de la luz ambiente
-float ambientIntensity = 0.5f; //Intensidad de la luz ambiente
-float difuseIntensity = 0.5f; //Intensidad de la luz difusa
-float difuseColor[4] = { 0.5f, 0.5f, 0.5f, 0.5f }; //Color de la luz difusa
-float lightDirection[4] = { 0.0f, 0.1f, 0.0f, 0.0f }; //Direcci�n de la luz direccional
-float pointPos[4] = { 0.0f, 40.0f, -20.0f, 0.0f }; //Posici�n de la PointLight
-float specularColor[4] = { 1.0f, 0.0f, 0.0f, 0.0f }; //Color de la luz especular
-float specularIntensity = 0.5f; //Intensidad de la luz especular
-int specularDensity = 32; //Densidad de la luz especular
+//Variables de shader
+namespace ShaderVariables {
+	float ambientColor[4] = { 1.f, 1.f, 1.f, 1.f }; //Color de la luz ambiente
+	float ambientIntensity = 0.5f; //Intensidad de la luz ambiente
+	float difuseIntensity = 0.5f; //Intensidad de la luz difusa
+	float difuseColor[4] = { 0.5f, 0.5f, 0.5f, 0.5f }; //Color de la luz difusa
+	float lightDirection[4] = { 0.0f, 0.1f, 0.0f, 0.0f }; //Direcci�n de la luz direccional
+	float pointPos[4] = { 0.0f, 40.0f, -20.0f, 0.0f }; //Posici�n de la PointLight
+	float specularColor[4] = { 1.0f, 0.0f, 0.0f, 0.0f }; //Color de la luz especular
+	float specularIntensity = 0.5f; //Intensidad de la luz especular
+	int specularDensity = 32; //Densidad de la luz especular
+} namespace SV = ShaderVariables;
+
+//Variables de c�mara
 float camPos[2] = { 0.0f, -31.95f }; //Posici�n de la c�mara
 float camRot[2] = { 0.0f, 0.5f }; //Rotaci�n de la c�mara
 float zoom = 62.0f; //Posici�n de la c�mara en el eje Z, o zoom
 float fov = 65.0f; //Campo de visi�n de la c�mara
-static int lightSelection = 0; //Selector del tipo de iluminaci�n (direccional o point)
+
+//Other variables
+int gWidth, gHeight; //Variables globales del ancho y alto de la pantalla
 #pragma endregion
 
 ///////// fw decl
@@ -253,6 +258,10 @@ namespace Textures {
 	std::map<const char*, unsigned char*> imgLocation;
 }
 
+namespace Shaders {
+	std::map<const char*, std::string> shaderLocation;
+}
+
 GLuint program;
 GLuint VAO;
 GLuint VBO;
@@ -375,20 +384,16 @@ void GLrender(float dt) {
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
-	camaro.draw(camaro.pos, camaro.rotation, camaro.axisRotation, camaro.scale, camaro.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	camaro.draw();
+	mesa.draw();
+	cube.draw(fboTex);
 
-	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
-
-	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
-
-	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
+	//billboard.draw();
 
 	/////////////////////////////////////////////////////////
 
 	glBindVertexArray(0);
-	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #pragma endregion
 
@@ -448,7 +453,7 @@ void GLrender(float dt) {
 		/////////////////////////////////////////////////////////
 
 	glBindVertexArray(0);
-	
+
 	ImGui::Render();
 #pragma endregion
 }
@@ -467,32 +472,29 @@ void GUI() {
 			ImGui::Indent();
 			if (ImGui::CollapsingHeader("Luz")) {
 				ImGui::Indent();
-				ImGui::DragFloat4("Direccion Luz Direccional", lightDirection, 0.05f, -1.0f, 1.0f);
-				ImGui::DragFloat4("Posicion PointLight", pointPos, 1.f, -200.0f, 200.0f);
-				ImGui::RadioButton("Directional Light", &lightSelection, 0); ImGui::SameLine();
-				ImGui::RadioButton("Point Light", &lightSelection, 1);
+				ImGui::DragFloat4("Direccion Luz Direccional", SV::lightDirection, 0.05f, -1.0f, 1.0f);
 				ImGui::Unindent();
 			}
 
 			if (ImGui::CollapsingHeader("Ambiente")) {
 				ImGui::Indent();
-				ImGui::ColorEdit4("Color Ambiente", ambientColor);
-				ImGui::DragFloat("Intensidad Ambiente", &ambientIntensity, 0.005f, 0.0f, 1.0f);
+				ImGui::ColorEdit4("Color Ambiente", SV::ambientColor);
+				ImGui::DragFloat("Intensidad Ambiente", &SV::ambientIntensity, 0.005f, 0.0f, 1.0f);
 				ImGui::Unindent();
 			}
 
 			if (ImGui::CollapsingHeader("Difuso")) {
 				ImGui::Indent();
-				ImGui::ColorEdit4("Color Difuso", difuseColor);
-				ImGui::DragFloat("Intensidad Difuso", &difuseIntensity, 0.005f, 0.0f, 1.0f);
+				ImGui::ColorEdit4("Color Difuso", SV::difuseColor);
+				ImGui::DragFloat("Intensidad Difuso", &SV::difuseIntensity, 0.005f, 0.0f, 1.0f);
 				ImGui::Unindent();
 			}
 
 			if (ImGui::CollapsingHeader("Specular")) {
 				ImGui::Indent();
-				ImGui::ColorEdit4("Color Specular", specularColor);
-				ImGui::DragFloat("Intensidad Specular", &specularIntensity, 0.005f, 0.0f, 5.0f);
-				ImGui::DragInt("Densidad Specular", &specularDensity, 2, 0, 512);
+				ImGui::ColorEdit4("Color Specular", SV::specularColor);
+				ImGui::DragFloat("Intensidad Specular", &SV::specularIntensity, 0.005f, 0.0f, 5.0f);
+				ImGui::DragInt("Densidad Specular", &SV::specularDensity, 2, 0, 512);
 				ImGui::Unindent();
 			}
 			ImGui::Unindent();

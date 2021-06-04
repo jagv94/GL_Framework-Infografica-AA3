@@ -12,6 +12,15 @@
 #include <vector>
 #include <../shader_s.h>
 
+namespace RenderVars {
+	extern glm::mat4 _projection;
+	extern glm::mat4 _modelView;
+	extern glm::mat4 _MVP;
+	extern glm::mat4 _inv_modelview;
+	extern glm::vec4 _cameraPoint;
+}
+namespace RV = RenderVars;
+
 class Billboard
 {
 private:
@@ -36,6 +45,6 @@ public:
 	Billboard();
 	Billboard(unsigned int _texture, Shader _shader);
 	void update(const glm::mat4& transform);
-	void draw(float _pos[], glm::mat4 _modelView, glm::mat4 _MVP);
+	void draw();
 	void cleanup();
 };

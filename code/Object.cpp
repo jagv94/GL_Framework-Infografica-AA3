@@ -60,9 +60,7 @@ void Object::update(const glm::mat4& _transform) {
 	objMat = _transform;
 }
 
-void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], float _color[], float _ambientColor[], float _ambientIntensity, float _difuseIntensity,
-	float _difuseColor[], float _lightDirection[], float _pointPos[], float _specularColor[], float _specularIntensity,
-	int _specularDensity, int _lightSelection, glm::mat4 _modelView, glm::mat4 _MVP) {
+void Object::draw() {
 	glBindVertexArray(objectVao);
 
 	ourShader.use(); //Activamos el shader antes de configurar los uniforms
@@ -75,25 +73,24 @@ void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _s
 
 	}
 
-	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(_pos[0], _pos[1], _pos[2]));
-	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(_rotation), glm::vec3(_axisRotation[0], _axisRotation[1], _axisRotation[2]));
-	glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(_scale[0], _scale[1], _scale[2]));
+	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(pos[0], pos[1], pos[2]));
+	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(rotation), glm::vec3(axisRotation[0], axisRotation[1], axisRotation[2]));
+	glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(scale[0], scale[1], scale[2]));
 	objMat = t * r * s;
 
 	ourShader.setMat4("objMat", objMat);
-	ourShader.setMat4("mv_Mat", _modelView);
-	ourShader.setMat4("mvpMat", _MVP);
-	ourShader.setVec4("objectColor", _color[0], _color[1], _color[2], _color[3]);
-	ourShader.setVec4("ambientColor", _ambientColor[0], _ambientColor[1], _ambientColor[2], _ambientColor[3]); /*sin(currentTime) * 0.5f + 0.5f, cos(currentTime) * 0.5f + 0.5f, 0.f, 1.f)*/ //Que el color cambie con el tiempo
-	ourShader.setVec4("ambientIntensity", _ambientIntensity, _ambientIntensity, _ambientIntensity, _ambientIntensity);
-	ourShader.setVec4("difuseIntensity", _difuseIntensity, _difuseIntensity, _difuseIntensity, _difuseIntensity);
-	ourShader.setVec4("difuseColor", _difuseColor[0], _difuseColor[1], _difuseColor[2], _difuseColor[3]);
-	ourShader.setVec4("directional_light", _lightDirection[0], _lightDirection[1], _lightDirection[2], _lightDirection[3]);
-	ourShader.setVec4("pointLight_pos", _pointPos[0], _pointPos[1], _pointPos[2], _pointPos[3]);
-	ourShader.setVec4("specularColor", _specularColor[0], _specularColor[1], _specularColor[2], _specularColor[3]);
-	ourShader.setVec4("specularIntensity", _specularIntensity, _specularIntensity, _specularIntensity, _specularIntensity);
-	ourShader.setFloat("specularDensity", _specularDensity);
-	ourShader.setFloat("lightSelection", _lightSelection);
+	ourShader.setMat4("mv_Mat", RV::_modelView);
+	ourShader.setMat4("mvpMat", RV::_MVP);
+	ourShader.setVec4("objectColor", color[0], color[1], color[2], color[3]);
+	ourShader.setVec4("ambientColor", SV::ambientColor[0], SV::ambientColor[1], SV::ambientColor[2], SV::ambientColor[3]); /*sin(currentTime) * 0.5f + 0.5f, cos(currentTime) * 0.5f + 0.5f, 0.f, 1.f)*/ //Que el color cambie con el tiempo
+	ourShader.setVec4("ambientIntensity", SV::ambientIntensity, SV::ambientIntensity, SV::ambientIntensity, SV::ambientIntensity);
+	ourShader.setVec4("difuseIntensity", SV::difuseIntensity, SV::difuseIntensity, SV::difuseIntensity, SV::difuseIntensity);
+	ourShader.setVec4("difuseColor", SV::difuseColor[0], SV::difuseColor[1], SV::difuseColor[2], SV::difuseColor[3]);
+	ourShader.setVec4("directional_light", SV::lightDirection[0], SV::lightDirection[1], SV::lightDirection[2], SV::lightDirection[3]);
+	ourShader.setVec4("pointLight_pos", SV::pointPos[0], SV::pointPos[1], SV::pointPos[2], SV::pointPos[3]);
+	ourShader.setVec4("specularColor", SV::specularColor[0], SV::specularColor[1], SV::specularColor[2], SV::specularColor[3]);
+	ourShader.setVec4("specularIntensity", SV::specularIntensity, SV::specularIntensity, SV::specularIntensity, SV::specularIntensity);
+	ourShader.setFloat("specularDensity", SV::specularDensity);
 	ourShader.setVec3("randomizedVec", randomizedVec.x, randomizedVec.y, randomizedVec.z);
 	ourShader.setFloat("time", ImGui::GetTime());
 
@@ -103,7 +100,7 @@ void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _s
 	glBindVertexArray(0);
 }
 
-void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], unsigned int _framebuffer, glm::mat4 _modelView, glm::mat4 _MVP) {
+void Object::draw(unsigned int _framebuffer) {
 	glBindVertexArray(objectVao);
 
 	ourShader.use(); //Activamos el shader antes de configurar los uniforms
@@ -112,14 +109,14 @@ void Object::draw(float _pos[], float _rotation, float _axisRotation[], float _s
 	glActiveTexture(GL_TEXTURE0); //Activamos la textura antes de bindearla
 	glBindTexture(GL_TEXTURE_2D, _framebuffer); //Bindeamos la texztura (empezamos a acceder a la información de la textura)
 
-	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(_pos[0], _pos[1], _pos[2]));
-	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(_rotation), glm::vec3(_axisRotation[0], _axisRotation[1], _axisRotation[2]));
-	glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(_scale[0], _scale[1], _scale[2]));
+	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(pos[0], pos[1], pos[2]));
+	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(rotation), glm::vec3(axisRotation[0], axisRotation[1], axisRotation[2]));
+	glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(scale[0], scale[1], scale[2]));
 	objMat = t * r * s;
 
 	ourShader.setMat4("objMat", objMat);
-	ourShader.setMat4("mv_Mat", _modelView);
-	ourShader.setMat4("mvpMat", _MVP);
+	ourShader.setMat4("mv_Mat", RV::_modelView);
+	ourShader.setMat4("mvpMat", RV::_MVP);
 	ourShader.setVec3("randomizedVec", randomizedVec.x, randomizedVec.y, randomizedVec.z);
 	ourShader.setFloat("time", ImGui::GetTime());
 

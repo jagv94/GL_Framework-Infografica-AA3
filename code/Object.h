@@ -9,6 +9,28 @@
 #include <cassert>
 #include <vector>
 
+namespace RenderVars {
+	extern glm::mat4 _projection;
+	extern glm::mat4 _modelView;
+	extern glm::mat4 _MVP;
+	extern glm::mat4 _inv_modelview;
+	extern glm::vec4 _cameraPoint;
+}
+namespace RV = RenderVars;
+
+namespace ShaderVariables {
+	extern float ambientColor[4]; //Color de la luz ambiente
+	extern float ambientIntensity; //Intensidad de la luz ambiente
+	extern float difuseIntensity;  //Intensidad de la luz difusa
+	extern float difuseColor[4]; //Color de la luz difusa
+	extern float lightDirection[4]; //Dirección de la luz direccional
+	extern float pointPos[4]; //Posición de la PointLight
+	extern float specularColor[4]; //Color de la luz especular
+	extern float specularIntensity; //Intensidad de la luz especular
+	extern int specularDensity; //Densidad de la luz especular
+}
+namespace SV = ShaderVariables;
+
 class Object
 {
 private:
@@ -42,10 +64,8 @@ public:
 	Object();
 	Object(const char* _modelPath, unsigned int _texture, Shader _shader);
 
-	void draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], float _color[], float _ambientColor[], float _ambientIntensity, float _difuseIntensity,
-		float _difuseColor[], float _lightDirection[], float _pointPos[], float _specularColor[], float _specularIntensity,
-		int _specularDesity, int _lightSelection, glm::mat4 _modelView, glm::mat4 _MVP);
-	void draw(float _pos[], float _rotation, float _axisRotation[], float _scale[], unsigned int _framebuffer, glm::mat4 _modelView, glm::mat4 _MVP);
+	void draw();
+	void draw(unsigned int _framebuffer);
 	void update(const glm::mat4& transform);
 	void cleanup();
 };
