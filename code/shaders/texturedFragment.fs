@@ -16,22 +16,11 @@
 	uniform vec4 specularColor; //Color de la luz especular
 	uniform vec4 specularIntensity; //Intensidad de la luz especular
 	uniform float specularDensity; //Densidad especular
-	uniform int lightSelection; //Selector del tipo de iluminacion (direccional o point)
 	uniform sampler2D ourTexture;
 	vec4 posCamera; //Posición de la camara
 	vec3 result; //Resultado de las operaciones
 	void main() {
-		switch(lightSelection){ //Switch para la selección de iluminación
-			case 0:
-				lightDirection = directional_light; //Asignamos la dirección de la luz como de directional light
-				break;
-			case 1:
-				lightDirection = normalize(pointLight_pos - fragPos); //Asignamos la dirección de la luz como la de la point light
-				break;
-			default:
-				lightDirection = directional_light; //Asignamos la dirección de la luz como de directional light
-				break;
-		}
+		lightDirection = directional_light; //Asignamos la dirección de la luz como de directional light
 
 		posCamera = inverse(mv_Mat)[3]; //Obtenemos la posición de la cámara de la inversa de matrix view
 		//luz ambiente (color ambiente * intensidad ambiente)
