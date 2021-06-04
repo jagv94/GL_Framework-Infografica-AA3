@@ -257,6 +257,10 @@ namespace Textures {
 	std::map<const char*, unsigned char*> imgLocation;
 }
 
+namespace Shaders {
+	std::map<const char*, std::string> shaderLocation;
+}
+
 GLuint program;
 GLuint VAO;
 GLuint VBO;
@@ -306,7 +310,7 @@ void GLinit(int width, int height) {
 
 	//Preparamos los objetos a utilizar
 	bmw = Object("resources/BMWX5.obj", metalTex.GetImg(), texturedShader);
-	mesa = Object("resources/mesa.obj", mesaTex.GetImg(), toonShader);
+	mesa = Object("resources/mesa.obj", mesaTex.GetImg(), texturedShader);
 	//bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
 	//mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
 	//cube = Object("resources/cube.obj", "resources/checker.jpg", true, texturedShader);

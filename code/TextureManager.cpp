@@ -14,12 +14,11 @@ TextureManager::TextureManager(const char* _texturePath, bool _fliped)
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
+			Textures::imgLocation[_texturePath] = data;
 		}
 		else printf("Failed to load texture\n");
 	}
-	else {
-		data = Textures::imgLocation.at(_texturePath);
-	}
+	else data = Textures::imgLocation.at(_texturePath);
 
 	//Filtros de la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

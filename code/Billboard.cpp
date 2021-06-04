@@ -32,7 +32,7 @@ void Billboard::update(const glm::mat4& _transform)
 	objMat = _transform;
 }
 
-void Billboard::draw(float _pos[], glm::mat4 _modelView, glm::mat4 _MVP)
+void Billboard::draw()
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -42,12 +42,12 @@ void Billboard::draw(float _pos[], glm::mat4 _modelView, glm::mat4 _MVP)
 	glActiveTexture(GL_TEXTURE0); //Activamos la textura antes de bindearla
 	glBindTexture(GL_TEXTURE_2D, texture); //Bindeamos la texztura (empezamos a acceder a la información de la textura)
 
-	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(_pos[0], _pos[1], _pos[2]));
+	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(pos[0], pos[1], pos[2]));
 	objMat = t;
 
 	ourShader.setMat4("objMat", objMat);
-	ourShader.setMat4("mv_Mat", _modelView);
-	ourShader.setMat4("mvpMat", _MVP);
+	ourShader.setMat4("mv_Mat", RV::_modelView);
+	ourShader.setMat4("mvpMat", RV::_MVP);
 
 	glDrawArrays(GL_POINTS, 0, vertices.size());
 

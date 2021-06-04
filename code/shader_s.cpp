@@ -43,26 +43,47 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	try
 	{
 		// open files
-		vShaderFile.open(vertexPath);
-		fShaderFile.open(fragmentPath);
-		std::stringstream vShaderStream, fShaderStream;
-		// read file's buffer contents into streams
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-		// close file handlers
-		vShaderFile.close();
-		fShaderFile.close();
-		// convert stream into string
-		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
+		if (Shaders::shaderLocation.find(vertexPath) == Shaders::shaderLocation.end())
+		{
+			vShaderFile.open(vertexPath);
+			std::stringstream vShaderStream;
+			// read file's buffer content into stream
+			vShaderStream << vShaderFile.rdbuf();
+			// close file handler
+			vShaderFile.close();
+			// convert stream into string
+			vertexCode = vShaderStream.str();
+			Shaders::shaderLocation[vertexPath] = vertexCode;
+		}
+		else vertexCode = Shaders::shaderLocation.at(vertexPath);
+
+		if (Shaders::shaderLocation.find(fragmentPath) == Shaders::shaderLocation.end())
+		{
+			fShaderFile.open(fragmentPath);
+			std::stringstream fShaderStream;
+			// read file's buffer content into stream
+			fShaderStream << fShaderFile.rdbuf();
+			// close file handler
+			fShaderFile.close();
+			// convert stream into string
+			fragmentCode = fShaderStream.str();
+			Shaders::shaderLocation[fragmentPath] = fragmentCode;
+		}
+		else fragmentCode = Shaders::shaderLocation.at(fragmentPath);
+		
 		// if geometry shader path is present, also load a geometry shader
 		if (geometryPath != nullptr)
 		{
-			gShaderFile.open(geometryPath);
-			std::stringstream gShaderStream;
-			gShaderStream << gShaderFile.rdbuf();
-			gShaderFile.close();
-			geometryCode = gShaderStream.str();
+			if (Shaders::shaderLocation.find(geometryPath) == Shaders::shaderLocation.end())
+			{
+				gShaderFile.open(geometryPath);
+				std::stringstream gShaderStream;
+				gShaderStream << gShaderFile.rdbuf();
+				gShaderFile.close();
+				geometryCode = gShaderStream.str();
+				Shaders::shaderLocation[geometryPath] = geometryCode;
+			}
+			else geometryCode = Shaders::shaderLocation.at(geometryPath);
 		}
 	}
 	catch (std::ifstream::failure& e)
@@ -71,7 +92,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	}
 	const char* vShaderCode = vertexCode.c_str();
 	const char* fShaderCode = fragmentCode.c_str();
-	
+
 	//Compilamos los shaders
 	GLuint vertex, fragment;
 	vertex = compileShader(vShaderCode, GL_VERTEX_SHADER, "VERTEX"); //Vertex shader

@@ -9,30 +9,25 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <map>
+
+namespace Shaders {
+	extern std::map<const char*, std::string> shaderLocation;
+}
 
 extern GLuint compileShader(const char* shaderStr, GLenum shaderType, const char* name);
 
 class Shader
 {
 private:
-	GLuint vao;
-	GLuint vbo;
+	GLuint vao = 0;
+	GLuint vbo = 0;
 
 	//Utilidad de comprobación de errores de linkado o compilación del shader
 	void checkCompileErrors(GLuint shader, std::string type);
 
 public:
 	unsigned int ID = 0;
-	float* ambientColor = new float[4];
-	float ambientIntensity;
-	float difuseIntensity;
-	float* difuseColor = new float[4];
-	float* lightDirection = new float[4];
-	float* pointPos = new float[4];
-	float* specularColor = new float[4];
-	float specularIntensity;
-	int specularDensity;
-	int lightSelection;
 
 	//Constructor
 	Shader();
