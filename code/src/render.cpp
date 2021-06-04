@@ -354,11 +354,11 @@ void GLrender(float dt) {
 #pragma region FrameBuffer
 	//FrameBuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
 	//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 	glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glStencilMask(0x00);
+	//glStencilMask(0x00);
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo);
 	//////////
 	//RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
 
