@@ -18,6 +18,19 @@ namespace RenderVars {
 }
 namespace RV = RenderVars;
 
+namespace ShaderVariables {
+	extern float ambientColor[4]; //Color de la luz ambiente
+	extern float ambientIntensity; //Intensidad de la luz ambiente
+	extern float difuseIntensity;  //Intensidad de la luz difusa
+	extern float difuseColor[4]; //Color de la luz difusa
+	extern float lightDirection[4]; //Dirección de la luz direccional
+	extern float pointPos[4]; //Posición de la PointLight
+	extern float specularColor[4]; //Color de la luz especular
+	extern float specularIntensity; //Intensidad de la luz especular
+	extern int specularDensity; //Densidad de la luz especular
+}
+namespace SV = ShaderVariables;
+
 class Object
 {
 private:
@@ -51,9 +64,7 @@ public:
 	Object();
 	Object(const char* _modelPath, unsigned int _texture, Shader _shader);
 
-	void draw(float _color[], float _ambientColor[], float _ambientIntensity, float _difuseIntensity,
-		float _difuseColor[], float _lightDirection[], float _pointPos[], float _specularColor[], float _specularIntensity,
-		int _specularDesity, int _lightSelection);
+	void draw();
 	void draw(unsigned int _framebuffer);
 	void update(const glm::mat4& transform);
 	void cleanup();
