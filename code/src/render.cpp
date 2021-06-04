@@ -333,6 +333,14 @@ void GLinit(int width, int height) {
 	camaro.scale[0] = 0.3f;
 	camaro.scale[1] = 0.3f;
 	camaro.scale[2] = 0.3f;
+
+	camaro2.pos[0] = 20.f;
+	camaro2.pos[1] = 40.f;
+	camaro2.pos[2] = -12.f;
+	camaro2.scale[0] = 0.3f;
+	camaro2.scale[1] = 0.3f;
+	camaro2.scale[2] = 0.3f;
+
 	/*billboard.pos[0] = -15.f;
 	billboard.pos[1] = 50.f;*/
 	cube.pos[0] = -20.f;
@@ -417,18 +425,16 @@ void GLrender(float dt) {
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
-	mesa.draw(mesa.pos, mesa.rotation, mesa.axisRotation, mesa.scale, mesa.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	mesa.draw();
 
-	cube.draw(cube.pos, cube.rotation, cube.axisRotation, cube.scale, fboTex, RenderVars::_modelView, RenderVars::_MVP);
+	cube.draw(fboTex);
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0xFF);
 
-	camaro.draw(camaro.pos, camaro.rotation, camaro.axisRotation, camaro.scale, camaro.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	camaro.draw();
 
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -437,8 +443,7 @@ void GLrender(float dt) {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	camaro2.draw(camaro.pos, camaro.rotation, camaro.axisRotation, camaro.scale, camaro.color, ambientColor, ambientIntensity, difuseIntensity, difuseColor, lightDirection, pointPos,
-		specularColor, specularIntensity, specularDensity, lightSelection, RenderVars::_modelView, RenderVars::_MVP);
+	camaro2.draw();
 
 	glStencilMask(0xFF);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
