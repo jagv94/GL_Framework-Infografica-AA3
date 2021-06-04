@@ -380,7 +380,7 @@ void GLrender(float dt) {
 	mesa.draw();
 	cube.draw(fboTex);
 
-	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
+	//billboard.draw();
 
 	/////////////////////////////////////////////////////////
 
@@ -411,7 +411,7 @@ void GLrender(float dt) {
 	mesa.draw();
 	cube.draw(fboTex);
 
-	//billboard.draw(billboard.pos, RenderVars::_modelView, RenderVars::_MVP);
+	//billboard.draw();
 
 		/////////////////////////////////////////////////////////
 
