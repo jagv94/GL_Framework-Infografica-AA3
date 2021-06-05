@@ -360,6 +360,7 @@ void GLcleanup() {
 	// Do your cleanup code here
 
 	camaro.cleanup();
+	camaro2.cleanup();
 	mesa.cleanup();
 	cube.cleanup();
 	//billboard.cleanup();
