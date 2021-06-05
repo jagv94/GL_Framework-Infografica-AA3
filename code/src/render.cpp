@@ -48,6 +48,7 @@ float fov = 65.0f; //Campo de visión de la cámara
 //Variables cámara framebuffer
 float fboCamPos[3] = { 13.5f, -51.f, 32.f };
 float fboCamRot[2]{ 96.f, -18.5f };
+int fboWidth, fboHeight, otherFboWidth, otherFboHeight;
 #pragma endregion
 
 ///////// fw decl
@@ -68,6 +69,7 @@ namespace RenderVars {
 	const float zFar = 50.f;
 
 	glm::mat4 _projection;
+	glm::mat4 _projectionAux;
 	glm::mat4 _modelView;
 	glm::mat4 _MVP;
 	glm::mat4 _inv_modelview;
@@ -88,6 +90,20 @@ void GLResize(int width, int height) {
 	glViewport(0, 0, width, height);
 	if (height != 0) RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
 	else RV::_projection = glm::perspective(glm::radians(fov), 0.f, RV::zNear, RV::zFar * 100);
+
+	if (RV::_projectionAux == RV::_projection)
+	{
+		fboWidth = 800 / 1.3;
+		fboHeight = 600 / 1.3;
+		framebuffer = Framebuffer(fbo, fboTex, fboWidth, fboHeight);
+	}
+
+	else
+	{
+		otherFboWidth = 2560 / 1.3;
+		otherFboHeight = 1440 / 1.3;
+		framebuffer = Framebuffer(fbo, fboTex, otherFboWidth, otherFboHeight);
+	}
 }
 
 void GLmousecb(MouseEvent ev) {
@@ -289,6 +305,7 @@ void GLinit(int width, int height) {
 	glEnable(GL_CULL_FACE);
 
 	RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
+	RV::_projectionAux = RV::_projection;
 
 	// Setup shaders & geometry
 	Axis::setupAxis();
@@ -301,7 +318,10 @@ void GLinit(int width, int height) {
 	mesaTex = TextureManager("resources/mesaColor.png", true);
 
 	//Preparamos el framebuffer
-	framebuffer = Framebuffer(fbo, fboTex);
+	fboWidth = width / 1.3;
+	fboHeight = height / 1.3;
+	framebuffer = Framebuffer(fbo, fboTex, width, height);
+
 
 	//Preparamos los shaders
 	//texturedExplosionShader = Shader("shaders/vertexExplosion.vs", "shaders/texturedFragment.fs", "shaders/explosionGeometry.gs");
@@ -363,8 +383,6 @@ void GLcleanup() {
 
 void GLrender(float dt) {
 #pragma region FrameBuffer
-	//GLResize(800, 600);
-
 	//FrameBuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
