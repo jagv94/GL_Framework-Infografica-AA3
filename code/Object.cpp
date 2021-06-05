@@ -69,9 +69,6 @@ void Object::draw() {
 		glActiveTexture(GL_TEXTURE0); //Activamos la textura antes de bindearla
 		glBindTexture(GL_TEXTURE_2D, texture); //Bindeamos la texztura (empezamos a acceder a la información de la textura)
 	}
-	else {
-
-	}
 
 	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(pos[0], pos[1], pos[2]));
 	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(rotation), glm::vec3(axisRotation[0], axisRotation[1], axisRotation[2]));

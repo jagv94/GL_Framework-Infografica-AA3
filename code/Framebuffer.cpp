@@ -1,4 +1,5 @@
 #include "Framebuffer.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 Framebuffer::Framebuffer() {}
 Framebuffer::Framebuffer(unsigned int& _fbo, unsigned int& _fboTex) {
@@ -9,7 +10,7 @@ Framebuffer::Framebuffer(unsigned int& _fbo, unsigned int& _fboTex) {
 	////create texture exactly as before:
 	glGenTextures(1, &_fboTex);
 	glBindTexture(GL_TEXTURE_2D, _fboTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 600, 200, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -24,7 +25,7 @@ Framebuffer::Framebuffer(unsigned int& _fbo, unsigned int& _fboTex) {
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 600, 200);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
