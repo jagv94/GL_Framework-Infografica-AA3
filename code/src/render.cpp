@@ -10,21 +10,19 @@
 
 #pragma region Variables
 //Texturas
-TextureManager metalTex;
-TextureManager mesaTex;
-TextureManager camaroTex;
+TextureManager metalTex, mesaTex, billboardTex, camaroTex;
 
 //Shaders
 Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind, texturedShaderTransparency;
 
 //Objetos
-Object mesa, bmw, cube, camaro, camaro2;
+Object mesa, bmw, cube, camaro, camaro2, retrovisor;
 
 //SkyBox
 CubeMap* skyBox;
 
 //Billboards
-//Billboard billboard;
+Billboard billboard;
 
 //Framebuffers
 Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebuffer, devolver los datos a la variable _framebuffer
@@ -50,8 +48,13 @@ float camRot[2] = { 0.0f, 0.5f }; //Rotaci�n de la c�mara
 float zoom = 62.0f; //Posici�n de la c�mara en el eje Z, o zoom
 float fov = 65.0f; //Campo de visi�n de la c�mara
 
+//Variables c�mara framebuffer
+float fboCamPos[3] = { -6.7f, -98.5f, 32.f };
+float fboCamRot[2]{ 92.f, 0.f };
+int fboWidth, fboHeight, otherFboWidth, otherFboHeight;
+
 //Other variables
-int gWidth, gHeight; //Variables globales del ancho y alto de la pantalla
+int gWidth, gHeight;
 #pragma endregion
 
 ///////// fw decl
@@ -92,6 +95,8 @@ void GLResize(int width, int height) {
 	glViewport(0, 0, width, height);
 	if (height != 0) RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
 	else RV::_projection = glm::perspective(glm::radians(fov), 0.f, RV::zNear, RV::zFar * 100);
+	gWidth = width;
+	gHeight = height;
 }
 
 void GLmousecb(MouseEvent ev) {
@@ -278,12 +283,16 @@ float vertex[9] = {
 
 GLuint unifLocation;
 
+float camPosition[] = { 0.f, 0.f, 0.f };
+float camRotation[] = { 0.f, 0.f, 0.f };
+
 #pragma region Main
 void GLinit(int width, int height) {
-	srand(time(nullptr));
-
 	gWidth = width;
 	gHeight = height;
+
+	srand(time(nullptr));
+
 	glViewport(0, 0, width, height);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 	glClearDepth(1.f);
@@ -304,9 +313,10 @@ void GLinit(int width, int height) {
 	metalTex = TextureManager("resources/metal.jpg", true);
 	mesaTex = TextureManager("resources/mesaColor.png", true);
 	camaroTex = TextureManager("resources/Camaro_AlbedoTransparency_alt.png", true);
+	billboardTex = TextureManager("resources/arbol.png", true);
 
 	//Preparamos el framebuffer
-	framebuffer = Framebuffer(fbo, fboTex);
+	framebuffer = Framebuffer(fbo, fboTex, 600, 200);
 
 	//Preparamos los shaders
 	//texturedExplosionShader = Shader("shaders/vertexExplosion.vs", "shaders/texturedFragment.fs", "shaders/explosionGeometry.gs");
@@ -314,7 +324,7 @@ void GLinit(int width, int height) {
 	texturedShaderNoWind = Shader("shaders/texturedVertex.vs", "shaders/texturedFragmentDiscardWind.fs");
 	texturedShaderTransparency = Shader("shaders/texturedVertex.vs", "shaders/texturedFragmentTransparency.fs");
 	nonTexturedShader = Shader("shaders/vertex.vs", "shaders/fragment.fs");
-	//billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
+	billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
 	toonShader = Shader("shaders/texturedVertex.vs", "shaders/toon.fs");
 
 	//Preparamos los objetos a utilizar
@@ -325,9 +335,9 @@ void GLinit(int width, int height) {
 	//bmw = Object("resources/BMWX5.obj", nullptr, true, nonTexturedShader);
 	//mesa = Object("resources/mesa.obj", nullptr, true, nonTexturedShader);
 	//cube = Object("resources/cube.obj", "resources/checker.jpg", true, texturedShader);
-	cube = Object("resources/cube.obj", fboTex, texturedShader);
+	retrovisor = Object("resources/retrovisor.obj", fboTex, texturedShader);
 
-	//billboard = Billboard("resources/arbol.png", true, billboardShader);
+	billboard = Billboard(billboardTex.GetImg(), billboardShader);
 
 	//BubeMap-SetTexture
 	std::vector<std::string> faces =
@@ -360,12 +370,18 @@ void GLinit(int width, int height) {
 
 	/*billboard.pos[0] = -15.f;
 	billboard.pos[1] = 50.f;*/
-	cube.pos[0] = -20.f;
-	cube.pos[1] = 60.f;
-	cube.pos[2] = -2.f;
-	cube.scale[0] = 10.f;
-	cube.scale[1] = 10.f;
-	cube.scale[2] = 10.f;
+	/*retrovisor.pos[0] = 0.f;
+	retrovisor.pos[1] = 50.f;
+	retrovisor.pos[2] = -40.f;*/
+	retrovisor.pos[0] = bmw.pos[0]-3.f;
+	retrovisor.pos[1] = bmw.pos[1]+17.5f;
+	retrovisor.pos[2] = bmw.pos[2]-0.25f;
+	retrovisor.scale[0] = 1.f;
+	retrovisor.scale[1] = 1.f;
+	retrovisor.scale[2] = 1.f;
+	camPosition[0] = retrovisor.pos[0];
+	camPosition[1] = retrovisor.pos[1];
+	camPosition[2] = retrovisor.pos[2];
 
 	/////////////////////////////////////////////////////////
 }
@@ -379,31 +395,35 @@ void GLcleanup() {
 	camaro.cleanup();
 	camaro2.cleanup();
 	mesa.cleanup();
-	cube.cleanup();
-	//billboard.cleanup();
+	retrovisor.cleanup();
+	billboard.cleanup();
 
 	/////////////////////////////////////////////////////////
 }
 
 void GLrender(float dt) {
+	retrovisor.rotation = bmw.rotation + 90.f;
+
 #pragma region FrameBuffer
 	//FrameBuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glViewport(0, 0, 600, 200);
+	RV::_projection = glm::perspective(glm::radians(fov), (float)600 / (float)200, RV::zNear, RV::zFar * 100);
+
 	//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 	glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	//glStencilMask(0x00);
 	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo);
 	//////////
-	//RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
 
 	//En la transformaci�n y rotaci�n del model view para la c�mara, �tilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la c�mara desde la interfaz de ser necesario.
-	RV::_modelView = glm::mat4(1.f);
-	RV::_modelView = glm::translate(RV::_modelView, glm::vec3(RV::panv[0] + camPos[0], RV::panv[1] + camPos[1], RV::panv[2] - zoom));
-	RV::_modelView = glm::rotate(RV::_modelView, RV::rota[1] + camRot[1], glm::vec3(1.f, 0.f, 0.f));
-	RV::_modelView = glm::rotate(RV::_modelView, RV::rota[0] + camRot[0], glm::vec3(0.f, 1.f, 0.f));
+	glm::mat4 fboModelView = glm::mat4(1.f); //Creamos el modelView para la c�mara del framebuffer
+	fboModelView = glm::translate(fboModelView, glm::vec3(bmw.pos[0] + fboCamPos[0], bmw.pos[1] + fboCamPos[1], bmw.pos[2] + fboCamPos[2])); //Ajustamos la translaci�n
+	fboModelView = glm::rotate(fboModelView, glm::radians(fboCamRot[1]), glm::vec3(1.f, 0.f, 0.f)); //Ajustamos la rotaci�n en Y
+	fboModelView = glm::rotate(fboModelView, glm::radians(-bmw.rotation + fboCamRot[0]), glm::vec3(0.f, 1.f, 0.f));  //Ajustamos la rotaci�n en X
 
-	RV::_MVP = RV::_projection * RV::_modelView;
+	RV::_MVP = RV::_projection * fboModelView;
 
 	Axis::drawAxis();
 
@@ -412,9 +432,9 @@ void GLrender(float dt) {
 
 	camaro.draw();
 	mesa.draw();
-	cube.draw(fboTex);
+	retrovisor.draw(fboTex);
 
-	//billboard.draw();
+	billboard.draw();
 
 	/////////////////////////////////////////////////////////
 
@@ -424,11 +444,9 @@ void GLrender(float dt) {
 #pragma endregion
 
 #pragma region ClassicRender
-	
+	GLResize(gWidth, gHeight);
 	glStencilMask(0xFF);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	//RV::_projection = glm::perspective(glm::radians(fov), (float)gWidth / (float)gHeight, RV::zNear, RV::zFar * 100); //Aumentamos la distancia de dibujado a por cien para evitar problemas en el dibujado de nuestros objetos.
 
 	//En la transformaci�n y rotaci�n del model view para la c�mara, �tilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la c�mara desde la interfaz de ser necesario.
 	RV::_modelView = glm::mat4(1.f);
@@ -444,9 +462,9 @@ void GLrender(float dt) {
 	// Do your render code here
 
 	mesa.draw();
+	retrovisor.draw(fboTex);
 
-	cube.draw(fboTex);
-
+	billboard.draw();
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -525,11 +543,10 @@ void GUI() {
 
 		if (ImGui::CollapsingHeader("BMW")) {
 			ImGui::Indent();
-			ImGui::ColorEdit4("Color BMW", camaro.color);
-			ImGui::DragFloat3("Posicion BMW", camaro.pos, 0.5f, -150, 150);
-			ImGui::DragFloat3("Eje de rotacion BMW", camaro.axisRotation, 1.f, 0.f, 1.f);
-			ImGui::DragFloat("Rotacion BMW", &camaro.rotation, 0.5f, -180, 180);
-			ImGui::DragFloat3("Escala BMW", camaro.scale, 0.1f, -100, 100);
+			ImGui::ColorEdit4("Color BMW", bmw.color);
+			ImGui::DragFloat3("Posicion BMW", bmw.pos, 0.5f, -150, 150);
+			ImGui::DragFloat("Rotacion BMW", &bmw.rotation, 0.5f, -180, 180);
+			ImGui::DragFloat3("Escala BMW", bmw.scale, 0.1f, -100, 100);
 			ImGui::Unindent();
 		}
 
@@ -537,19 +554,19 @@ void GUI() {
 			ImGui::Indent();
 			ImGui::ColorEdit4("Color mesa", mesa.color);
 			ImGui::DragFloat3("Posicion mesa", mesa.pos, 0.5f, -150, 150);
-			ImGui::DragFloat3("Eje de rotacion mesa", mesa.axisRotation, 1.f, 0.f, 1.f);
 			ImGui::DragFloat("Rotacion mesa", &mesa.rotation, 0.5f, -180, 180);
 			ImGui::DragFloat3("Escala mesa", mesa.scale, 0.1f, -100, 100);
 			ImGui::Unindent();
 		}
 
-		if (ImGui::CollapsingHeader("Cubo")) {
+		if (ImGui::CollapsingHeader("Retrovisor")) {
 			ImGui::Indent();
-			ImGui::ColorEdit4("Color cubo", cube.color);
-			ImGui::DragFloat3("Posicion cubo", cube.pos, 0.5f, -150, 150);
-			ImGui::DragFloat3("Eje de rotacion cubo", cube.axisRotation, 1.f, 0.f, 1.f);
-			ImGui::DragFloat("Rotacion cubo", &cube.rotation, 0.5f, -180, 180);
-			ImGui::DragFloat3("Escala cubo", cube.scale, 0.1f, -100, 100);
+			ImGui::ColorEdit4("Color retrovisor", retrovisor.color);
+			ImGui::DragFloat3("Posicion retrovisor", retrovisor.pos, 0.5f, -150, 150);
+			ImGui::DragFloat("Rotacion retrovisor", &retrovisor.rotation, 0.5f, -180, 180);
+			ImGui::DragFloat3("Escala retrovisor", retrovisor.scale, 0.1f, -100, 100);
+			ImGui::DragFloat3("Posicion camara retrovisor", fboCamPos, 0.1f, -100, 100);
+			ImGui::DragFloat2("Rotacion camara  retrovisor", fboCamRot, 0.5f, -180.f, 180.f);
 			ImGui::Unindent();
 		}
 
