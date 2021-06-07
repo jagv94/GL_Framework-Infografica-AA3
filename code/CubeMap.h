@@ -7,13 +7,16 @@
 
 class CubeMap
 {
-	unsigned int textureID;
+	//unsigned int textureID = 0;
 
 
 public:
-	CubeMap(std::vector<std::string> faces){}
+	/*CubeMap(){}
+	CubeMap(std::vector<std::string> faces){}*/
 
-	unsigned int ReturnIDTexture() { return textureID; }
+	unsigned int Start(std::vector<std::string> faces);
+
+	//unsigned int ReturnIDTexture() { return textureID; }
 
 };
 

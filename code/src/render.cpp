@@ -350,7 +350,7 @@ void GLinit(int width, int height) {
 		"../resources/skybox/back.jpg"
 	};
 
-	skyBox = new CubeMap(faces);
+	//skyBox = new CubeMap(faces);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -541,12 +541,12 @@ void GUI() {
 			ImGui::Unindent();
 		}
 
-		if (ImGui::CollapsingHeader("BMW")) {
+		if (ImGui::CollapsingHeader("camaro")) {
 			ImGui::Indent();
-			ImGui::ColorEdit4("Color BMW", bmw.color);
-			ImGui::DragFloat3("Posicion BMW", bmw.pos, 0.5f, -150, 150);
-			ImGui::DragFloat("Rotacion BMW", &bmw.rotation, 0.5f, -180, 180);
-			ImGui::DragFloat3("Escala BMW", bmw.scale, 0.1f, -100, 100);
+			ImGui::ColorEdit4("Color camaro", camaro.color);
+			ImGui::DragFloat3("Posicion camaro", camaro.pos, 0.5f, -150, 150);
+			ImGui::DragFloat("Rotacion camaro", &camaro.rotation, 0.5f, -180, 180);
+			ImGui::DragFloat3("Escala camaro", camaro.scale, 0.1f, -100, 100);
 			ImGui::Unindent();
 		}
 
