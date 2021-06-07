@@ -114,6 +114,16 @@ void Object::draw(unsigned int _framebuffer) {
 	ourShader.setMat4("objMat", objMat);
 	ourShader.setMat4("mv_Mat", RV::_modelView);
 	ourShader.setMat4("mvpMat", RV::_MVP);
+	ourShader.setVec4("objectColor", color[0], color[1], color[2], color[3]);
+	ourShader.setVec4("ambientColor", SV::ambientColor[0], SV::ambientColor[1], SV::ambientColor[2], SV::ambientColor[3]); /*sin(currentTime) * 0.5f + 0.5f, cos(currentTime) * 0.5f + 0.5f, 0.f, 1.f)*/ //Que el color cambie con el tiempo
+	ourShader.setVec4("ambientIntensity", SV::ambientIntensity, SV::ambientIntensity, SV::ambientIntensity, SV::ambientIntensity);
+	ourShader.setVec4("difuseIntensity", SV::difuseIntensity, SV::difuseIntensity, SV::difuseIntensity, SV::difuseIntensity);
+	ourShader.setVec4("difuseColor", SV::difuseColor[0], SV::difuseColor[1], SV::difuseColor[2], SV::difuseColor[3]);
+	ourShader.setVec4("directional_light", SV::lightDirection[0], SV::lightDirection[1], SV::lightDirection[2], SV::lightDirection[3]);
+	ourShader.setVec4("pointLight_pos", SV::pointPos[0], SV::pointPos[1], SV::pointPos[2], SV::pointPos[3]);
+	ourShader.setVec4("specularColor", SV::specularColor[0], SV::specularColor[1], SV::specularColor[2], SV::specularColor[3]);
+	ourShader.setVec4("specularIntensity", SV::specularIntensity, SV::specularIntensity, SV::specularIntensity, SV::specularIntensity);
+	ourShader.setFloat("specularDensity", SV::specularDensity);
 	ourShader.setVec3("randomizedVec", randomizedVec.x, randomizedVec.y, randomizedVec.z);
 	ourShader.setFloat("time", ImGui::GetTime());
 
