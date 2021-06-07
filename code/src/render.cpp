@@ -13,7 +13,7 @@
 TextureManager billboardTex, camaroTex, sueloTex;
 
 //Shaders
-Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind, texturedShaderTransparency;
+Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind, texturedShaderTransparency, skyBoxShader;
 
 //Objetos
 Object camaro, camaro2, retrovisor, suelo;
@@ -28,6 +28,7 @@ std::vector<Billboard> billboards;
 Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebuffer, devolver los datos a la variable _framebuffer
 unsigned int fbo;
 unsigned int fboTex;
+unsigned int cubeTex;
 bool activateFBO = false;
 
 //Stencil
@@ -316,6 +317,19 @@ void GLinit(int width, int height) {
 
 	/////////////////////////////////////////////////////TODO
 	// Do your init code here
+	// 
+	//CubeMap-SetTexture
+	std::vector<std::string> faces =
+	{
+		"resources/skybox/right.jpg",
+		"resources/skybox/left.jpg",
+		"resources/skybox/top.jpg",
+		"resources/skybox/bottom.jpg",
+		"resources/skybox/front.jpg",
+		"resources/skybox/back.jpg"
+	};
+
+	cubeTex = skyBox->Start(faces);
 
 	//Inicializamos los objetos de las clases creadas
 #pragma region initClasses
@@ -335,12 +349,14 @@ void GLinit(int width, int height) {
 	nonTexturedShader = Shader("shaders/vertex.vs", "shaders/fragment.fs");
 	billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
 	toonShader = Shader("shaders/texturedVertex.vs", "shaders/toon.fs");
+	skyBoxShader = Shader("shaders/skyBoxVertex.vs", "shaders/skyBoxFragment.fs");
 
 	//Preparamos los objetos a utilizar
 	camaro = Object("resources/Camaro.obj", camaroTex.GetImg(), texturedShaderNoWind);
 	camaro2 = Object("resources/Camaro.obj", camaroTex.GetImg(), texturedShaderTransparency);
 	suelo = Object("resources/floor.obj", sueloTex.GetImg(), texturedShader);
 	retrovisor = Object("resources/retrovisor.obj", fboTex, texturedShader);
+	skyBox = new CubeMap("resources/cube.obj", cubeTex, skyBoxShader);
 
 	for (int i = 0; i < billboardAmount; i++) {
 		glm::vec3 randomPos = randomize(-1500, 1500);
@@ -354,18 +370,8 @@ void GLinit(int width, int height) {
 		billboards.at(i).pos[2] = randomPos.z;
 	}
 
-	//BubeMap-SetTexture
-	std::vector<std::string> faces =
-	{
-		"../resources/skybox/right.jpg",
-		"../resources/skybox/left.jpg",
-		"../resources/skybox/top.jpg",
-		"../resources/skybox/bottom.jpg",
-		"../resources/skybox/front.jpg",
-		"../resources/skybox/back.jpg"
-	};
+	
 
-	//skyBox = new CubeMap(faces);
 #pragma endregion
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -508,12 +514,18 @@ void GLrender(float dt) {
 
 	RV::_MVP = RV::_projection * RV::_modelView;
 
+	skyBox->Draw(RV::_modelView, RV::_projection);
+
 	Axis::drawAxis();
 
 	/////////////////////////////////////////////////////TODO
 	// Do your render code here
 
+
+
 	suelo.draw();
+
+	
 
 	if (activateFBO) retrovisor.draw(fboTex);
 
@@ -521,6 +533,8 @@ void GLrender(float dt) {
 	{
 		var.draw();
 	}
+
+	
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -546,6 +560,8 @@ void GLrender(float dt) {
 	//glEnable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_BLEND);
+
+	
 
 	/////////////////////////////////////////////////////////
 
