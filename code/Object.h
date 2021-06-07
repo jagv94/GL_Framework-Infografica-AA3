@@ -58,7 +58,6 @@ public:
 	float color[4]{ 1.f, 1.f, 1.f, 1.f }; //Modificador del color del objeto
 	float pos[3]{ 0.f, 0.f, 0.f }; //Posicion del objeto
 	float rotation = 0.f; //Rotacion del objeto
-	float axisRotation[3]{ 0.f, 1.f, 0.f }; //Eje de rotacion del objeto
 	float scale[3]{ 1.f, 1.f, 1.f }; //Escala del objeto
 	
 	Object();

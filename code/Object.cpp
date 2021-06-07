@@ -71,7 +71,7 @@ void Object::draw() {
 	}
 
 	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(pos[0], pos[1], pos[2]));
-	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(rotation), glm::vec3(axisRotation[0], axisRotation[1], axisRotation[2]));
+	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(rotation), glm::vec3(0, 1, 0));
 	glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(scale[0], scale[1], scale[2]));
 	objMat = t * r * s;
 
@@ -107,7 +107,7 @@ void Object::draw(unsigned int _framebuffer) {
 	glBindTexture(GL_TEXTURE_2D, _framebuffer); //Bindeamos la texztura (empezamos a acceder a la información de la textura)
 
 	glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(pos[0], pos[1], pos[2]));
-	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(rotation), glm::vec3(axisRotation[0], axisRotation[1], axisRotation[2]));
+	glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(rotation), glm::vec3(0, 1, 0));
 	glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(scale[0], scale[1], scale[2]));
 	objMat = t * r * s;
 
