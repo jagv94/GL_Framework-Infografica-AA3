@@ -39,22 +39,22 @@ namespace ShaderVariables {
 	float ambientIntensity = 0.5f; //Intensidad de la luz ambiente
 	float difuseIntensity = 0.5f; //Intensidad de la luz difusa
 	float difuseColor[4] = { 0.5f, 0.5f, 0.5f, 0.5f }; //Color de la luz difusa
-	float lightDirection[4] = { 0.0f, 0.1f, 0.0f, 0.0f }; //Direcci�n de la luz direccional
-	float pointPos[4] = { 0.0f, 40.0f, -20.0f, 0.0f }; //Posici�n de la PointLight
+	float lightDirection[4] = { 0.0f, 0.1f, 0.0f, 0.0f }; //Direccion de la luz direccional
+	float pointPos[4] = { 0.0f, 40.0f, -20.0f, 0.0f }; //Posicion de la PointLight
 	float specularColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; //Color de la luz especular
 	float specularIntensity = 0.2f; //Intensidad de la luz especular
 	int specularDensity = 2; //Densidad de la luz especular
 } namespace SV = ShaderVariables;
 
-//Variables de c�mara
-float camPos[2] = { 0.0f, -24.5f }; //Posici�n de la c�mara
-float camRot[2] = { 180.f, 20.f }; //Rotaci�n de la c�mara
-float zoom = 100.0f; //Posicion de la c�mara en el eje Z, o zoom
-float fov = 65.0f; //Campo de visi�n de la c�mara
+//Variables de camara
+float camPos[2] = { 0.0f, -24.5f }; //Posicion de la camara
+float camRot[2] = { 180.f, 20.f }; //Rotacion de la camara
+float zoom = 100.0f; //Posicion de la camara en el eje Z, o zoom
+float fov = 65.0f; //Campo de vision de la camara
 bool changeCamera = false;
 bool cameraReset = false;
 
-//Variables c�mara framebuffer
+//Variables camara framebuffer
 float camPosition[] = { 0.f, 0.f, 0.f };
 float camRotation[] = { 0.f, 0.f, 0.f };
 float fboCamPos[] = { -40.f, -105.f, 20.5f };
@@ -317,6 +317,8 @@ void GLinit(int width, int height) {
 	/////////////////////////////////////////////////////TODO
 	// Do your init code here
 
+	//Inicializamos los objetos de las clases creadas
+#pragma region initClasses
 	//Preparamos las texturas
 	camaroTex = TextureManager("resources/Camaro_AlbedoTransparency_alt.png", true);
 	sueloTex = TextureManager("resources/floor.png", true);
@@ -364,9 +366,12 @@ void GLinit(int width, int height) {
 	};
 
 	//skyBox = new CubeMap(faces);
+#pragma endregion
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	//Seteamos las posiciones iniciales de los objetos en escena
+#pragma region initObjectSettings
 	camaro.pos[0] = 0.f;
 	camaro.pos[1] = 0.f;
 	camaro.pos[2] = 0.f;
@@ -392,6 +397,7 @@ void GLinit(int width, int height) {
 	RV::rota[0] = glm::radians(180.f);
 	RV::rota[1] = glm::radians(20.f);
 	RV::panv[2] = -150.f;
+#pragma endregion
 
 	/////////////////////////////////////////////////////////
 }
@@ -416,6 +422,7 @@ void GLcleanup() {
 }
 
 void GLrender(float dt) {
+	//Seteamos las posiciones que queremos que siempre sean iguales
 	retrovisor.rotation = camaro.rotation;
 	retrovisor.pos[0] = camaro.pos[0] - 0.15f;
 	retrovisor.pos[1] = camaro.pos[1] + 28.f;
@@ -424,6 +431,7 @@ void GLrender(float dt) {
 	fboCamPos[1] = -retrovisor.pos[1];
 	fboCamPos[2] = -retrovisor.pos[2];
 
+	//Seteamos las posiciones para los dos modos de camara
 	if (changeCamera) {
 		RV::panv[0] = 8.45f;
 		RV::panv[1] = -24;
@@ -457,11 +465,11 @@ void GLrender(float dt) {
 		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo);
 		//////////
 
-		//En la transformaci�n y rotaci�n del model view para la c�mara, �tilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la c�mara desde la interfaz de ser necesario.
-		glm::mat4 fboModelView = glm::mat4(1.f); //Creamos el modelView para la c�mara del framebuffer
-		fboModelView = glm::translate(fboModelView, glm::vec3(camaro.pos[0] + fboCamPos[0], camaro.pos[1] + fboCamPos[1], camaro.pos[2] + fboCamPos[2])); //Ajustamos la translaci�n
-		fboModelView = glm::rotate(fboModelView, glm::radians(fboCamRot[1]), glm::vec3(1.f, 0.f, 0.f)); //Ajustamos la rotaci�n en Y
-		fboModelView = glm::rotate(fboModelView, glm::radians(-camaro.rotation + fboCamRot[0]), glm::vec3(0.f, 1.f, 0.f));  //Ajustamos la rotaci�n en X
+		//En la transformacion y rotacion del model view para la camara, utilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la camara desde la interfaz de ser necesario.
+		glm::mat4 fboModelView = glm::mat4(1.f); //Creamos el modelView para la camara del framebuffer
+		fboModelView = glm::translate(fboModelView, glm::vec3(camaro.pos[0] + fboCamPos[0], camaro.pos[1] + fboCamPos[1], camaro.pos[2] + fboCamPos[2])); //Ajustamos la translacion
+		fboModelView = glm::rotate(fboModelView, glm::radians(fboCamRot[1]), glm::vec3(1.f, 0.f, 0.f)); //Ajustamos la rotacion en Y
+		fboModelView = glm::rotate(fboModelView, glm::radians(-camaro.rotation + fboCamRot[0]), glm::vec3(0.f, 1.f, 0.f));  //Ajustamos la rotacion en X
 
 		RV::_MVP = RV::_projection * fboModelView;
 
@@ -492,7 +500,7 @@ void GLrender(float dt) {
 	glStencilMask(0xFF);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	//En la transformaci�n y rotaci�n del model view para la c�mara, �tilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la c�mara desde la interfaz de ser necesario.
+	//En la transformacion y rotacion del model view para la camara, utilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la camara desde la interfaz de ser necesario.
 	RV::_modelView = glm::mat4(1.f);
 	RV::_modelView = glm::translate(RV::_modelView, glm::vec3(RV::panv[0], RV::panv[1], RV::panv[2]));
 	RV::_modelView = glm::rotate(RV::_modelView, RV::rota[1], glm::vec3(1.f, 0.f, 0.f));
