@@ -49,6 +49,9 @@ float fov = 65.0f; //Campo de visión de la cámara
 float fboCamPos[3] = { 13.5f, -51.f, 32.f };
 float fboCamRot[2]{ 96.f, -18.5f };
 int fboWidth, fboHeight, otherFboWidth, otherFboHeight;
+
+//Other variables
+int gWidth, gHeight;
 #pragma endregion
 
 ///////// fw decl
@@ -89,6 +92,8 @@ void GLResize(int width, int height) {
 	glViewport(0, 0, width, height);
 	if (height != 0) RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
 	else RV::_projection = glm::perspective(glm::radians(fov), 0.f, RV::zNear, RV::zFar * 100);
+	gWidth = width;
+	gHeight = height;
 }
 
 void GLmousecb(MouseEvent ev) {
@@ -280,6 +285,9 @@ float camRotation[] = { 0.f, 0.f, 0.f };
 
 #pragma region Main
 void GLinit(int width, int height) {
+	gWidth = width;
+	gHeight = height;
+
 	srand(time(nullptr));
 
 	glViewport(0, 0, width, height);
@@ -302,9 +310,7 @@ void GLinit(int width, int height) {
 	mesaTex = TextureManager("resources/mesaColor.png", true);
 
 	//Preparamos el framebuffer
-	fboWidth = width / 1.3;
-	fboHeight = height / 1.3;
-	framebuffer = Framebuffer(fbo, fboTex, width, height);
+	framebuffer = Framebuffer(fbo, fboTex, 600, 200);
 
 	//Preparamos los shaders
 	//texturedExplosionShader = Shader("shaders/vertexExplosion.vs", "shaders/texturedFragment.fs", "shaders/explosionGeometry.gs");
@@ -368,6 +374,8 @@ void GLrender(float dt) {
 #pragma region FrameBuffer
 	//FrameBuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glViewport(0, 0, 600, 200);
+	RV::_projection = glm::perspective(glm::radians(fov), (float)600 / (float)200, RV::zNear, RV::zFar * 100);
 
 	//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 	glClearColor(0.2f, 0.2f, 0.2f, 1.f);
@@ -401,6 +409,8 @@ void GLrender(float dt) {
 #pragma endregion
 
 #pragma region ClassicRender
+	GLResize(gWidth, gHeight);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//En la transformación y rotación del model view para la cámara, útilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la cámara desde la interfaz de ser necesario.
