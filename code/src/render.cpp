@@ -3,6 +3,7 @@
 #include "../Billboard.h"
 #include "../Framebuffer.h"
 #include "../TextureManager.h"
+#include "../CubeMap.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../stb_image.h"
@@ -18,6 +19,9 @@ Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedSha
 
 //Objetos
 Object mesa, bmw, cube, camaro, camaro2;
+
+//SkyBox
+CubeMap* skyBox;
 
 //Billboards
 //Billboard billboard;
@@ -324,6 +328,19 @@ void GLinit(int width, int height) {
 	cube = Object("resources/cube.obj", fboTex, texturedShader);
 
 	//billboard = Billboard("resources/arbol.png", true, billboardShader);
+
+	//BubeMap-SetTexture
+	std::vector<std::string> faces =
+	{
+		"../resources/skybox/right.jpg",
+		"../resources/skybox/left.jpg",
+		"../resources/skybox/top.jpg",
+		"../resources/skybox/bottom.jpg",
+		"../resources/skybox/front.jpg",
+		"../resources/skybox/back.jpg"
+	};
+
+	skyBox = new CubeMap(faces);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
