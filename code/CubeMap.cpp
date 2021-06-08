@@ -72,19 +72,12 @@ CubeMap::CubeMap(const char* _modelPath, unsigned int _texture, Shader _shader) 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindAttribLocation(ourShader.ID, 0, "in_Position");
-    //glBindAttribLocation(ourShader.ID, 1, "in_Normal");
-    /*if (texture > 0) {
-        glBindAttribLocation(ourShader.ID, 2, "aTexCoord");
-    }*/
+    
     linkProgram(ourShader.ID);
-
-    //randomizedVec = randomize(1.f, 10.f);
 }
 
 void CubeMap::Draw(glm::mat4 cameraView, glm::mat4 projection)
 {
-
-
     glDepthMask(GL_FALSE);
     ourShader.use();
     // ... set view and projection matrix
@@ -94,14 +87,10 @@ void CubeMap::Draw(glm::mat4 cameraView, glm::mat4 projection)
     glDepthMask(GL_TRUE);
     // ... draw rest of the scene
 
-     //Activamos el shader antes de configurar los uniforms
-
+    //Activamos el shader antes de configurar los uniforms
     glm::mat4 objMat = glm::mat4(1.f);
-
     glm::mat4 view = glm::mat4(glm::mat3(cameraView));
-
     glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(2000, 2000, 2000));
-
     objMat = view * s;
 
     ourShader.setMat4("view", objMat);
