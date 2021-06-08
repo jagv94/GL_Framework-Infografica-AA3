@@ -13,7 +13,7 @@
 TextureManager billboardTex, camaroTex, sueloTex;
 
 //Shaders
-Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind, texturedShaderTransparency;
+Shader objectShader, texturedShader, billboardShader, toonShader, nonTexturedShader, texturedShaderNoWind, texturedShaderTransparency, skyBoxShader;
 
 //Objetos
 Object camaro, camaro2, retrovisor, suelo;
@@ -28,6 +28,7 @@ std::vector<Billboard> billboards;
 Framebuffer framebuffer; //Framebuffer por objeto o una vez se settea el framebuffer, devolver los datos a la variable _framebuffer
 unsigned int fbo;
 unsigned int fboTex;
+unsigned int cubeTex;
 bool activateFBO = false;
 
 //Stencil
@@ -58,11 +59,11 @@ bool cameraReset = false;
 float camPosition[] = { 0.f, 0.f, 0.f };
 float camRotation[] = { 0.f, 0.f, 0.f };
 float fboCamPos[] = { -40.f, -105.f, 20.5f };
-float fboCamRot[]{ 0.f, 0.f };
+float fboCamRot[]{ 0.f, -10.f };
 int fboWidth, fboHeight, otherFboWidth, otherFboHeight;
 
 //Billboard
-int bilboardsLimitDistance = 1000, billboardsOffset = 150, billboardAmount = 30;
+int bilboardsLimitDistance = 1000, billboardsOffset = 150, billboardAmount = 100;
 
 //Other variables
 int gWidth, gHeight;
@@ -306,8 +307,6 @@ void GLinit(int width, int height) {
 	glClearDepth(1.f);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_STENCIL_TEST);
-	//glEnable(GL_CULL_FACE);
 
 	RV::_projection = glm::perspective(glm::radians(fov), (float)width / (float)height, RV::zNear, RV::zFar * 100);
 
@@ -316,6 +315,19 @@ void GLinit(int width, int height) {
 
 	/////////////////////////////////////////////////////TODO
 	// Do your init code here
+	// 
+	//CubeMap-SetTexture
+	std::vector<std::string> faces =
+	{
+		"resources/skybox/right.jpg",
+		"resources/skybox/left.jpg",
+		"resources/skybox/top.jpg",
+		"resources/skybox/bottom.jpg",
+		"resources/skybox/front.jpg",
+		"resources/skybox/back.jpg"
+	};
+
+	cubeTex = skyBox->Start(faces);
 
 	//Inicializamos los objetos de las clases creadas
 #pragma region initClasses
@@ -328,19 +340,18 @@ void GLinit(int width, int height) {
 	framebuffer = Framebuffer(fbo, fboTex, 600, 200);
 
 	//Preparamos los shaders
-	//texturedExplosionShader = Shader("shaders/vertexExplosion.vs", "shaders/texturedFragment.fs", "shaders/explosionGeometry.gs");
 	texturedShader = Shader("shaders/texturedVertex.vs", "shaders/texturedFragment.fs");
 	texturedShaderNoWind = Shader("shaders/texturedVertex.vs", "shaders/texturedFragmentDiscardWind.fs");
 	texturedShaderTransparency = Shader("shaders/texturedVertex.vs", "shaders/texturedFragmentTransparency.fs");
-	nonTexturedShader = Shader("shaders/vertex.vs", "shaders/fragment.fs");
 	billboardShader = Shader("shaders/texturedVertex.vs", "shaders/billboardFragment.fs", "shaders/billboardGeometry.gs");
-	toonShader = Shader("shaders/texturedVertex.vs", "shaders/toon.fs");
+	skyBoxShader = Shader("shaders/skyBoxVertex.vs", "shaders/skyBoxFragment.fs");
 
 	//Preparamos los objetos a utilizar
 	camaro = Object("resources/Camaro.obj", camaroTex.GetImg(), texturedShaderNoWind);
 	camaro2 = Object("resources/Camaro.obj", camaroTex.GetImg(), texturedShaderTransparency);
 	suelo = Object("resources/floor.obj", sueloTex.GetImg(), texturedShader);
 	retrovisor = Object("resources/retrovisor.obj", fboTex, texturedShader);
+	skyBox = new CubeMap("resources/cube.obj", cubeTex, skyBoxShader);
 
 	for (int i = 0; i < billboardAmount; i++) {
 		glm::vec3 randomPos = randomize(-1500, 1500);
@@ -354,18 +365,8 @@ void GLinit(int width, int height) {
 		billboards.at(i).pos[2] = randomPos.z;
 	}
 
-	//BubeMap-SetTexture
-	std::vector<std::string> faces =
-	{
-		"../resources/skybox/right.jpg",
-		"../resources/skybox/left.jpg",
-		"../resources/skybox/top.jpg",
-		"../resources/skybox/bottom.jpg",
-		"../resources/skybox/front.jpg",
-		"../resources/skybox/back.jpg"
-	};
+	
 
-	//skyBox = new CubeMap(faces);
 #pragma endregion
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -428,16 +429,15 @@ void GLrender(float dt) {
 	retrovisor.pos[1] = camaro.pos[1] + 28.f;
 	retrovisor.pos[2] = camaro.pos[2] + 8.f;
 	fboCamPos[0] = -retrovisor.pos[0];
-	fboCamPos[1] = -retrovisor.pos[1];
-	fboCamPos[2] = -retrovisor.pos[2];
+	fboCamPos[1] = -retrovisor.pos[1] + 5.f;
+	fboCamPos[2] = -retrovisor.pos[2] + 15.f;
 
 	//Seteamos las posiciones para los dos modos de camara
 	if (changeCamera) {
 		RV::panv[0] = 8.45f;
-		RV::panv[1] = -24;
-		//RV::rota[0] = glm::radians(180.f);
+		RV::panv[1] = -24.f;
 		RV::rota[1] = glm::radians(0.f);
-		RV::panv[2] = -5;
+		RV::panv[2] = -5.f;
 		cameraReset = true;
 	}
 
@@ -458,11 +458,8 @@ void GLrender(float dt) {
 		glViewport(0, 0, 600, 200);
 		RV::_projection = glm::perspective(glm::radians(fov), (float)600 / (float)200, RV::zNear, RV::zFar * 100);
 
-		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 		glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		//glStencilMask(0x00);
-		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo);
 		//////////
 
 		//En la transformacion y rotacion del model view para la camara, utilizamos las variables previamente preparadas camPos, camRot y zoom, para controlar la camara desde la interfaz de ser necesario.
@@ -478,6 +475,7 @@ void GLrender(float dt) {
 		/////////////////////////////////////////////////////TODO
 		// Do your render code here
 
+		skyBox->Draw(RV::_modelView, RV::_projection);
 		suelo.draw();
 		camaro.draw();
 		retrovisor.draw(fboTex);
@@ -508,6 +506,8 @@ void GLrender(float dt) {
 
 	RV::_MVP = RV::_projection * RV::_modelView;
 
+	skyBox->Draw(RV::_modelView, RV::_projection);
+
 	Axis::drawAxis();
 
 	/////////////////////////////////////////////////////TODO
@@ -532,7 +532,6 @@ void GLrender(float dt) {
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0x00);
-	//glDisable(GL_DEPTH_TEST);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -543,9 +542,10 @@ void GLrender(float dt) {
 	glStencilMask(0xFF);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	//glEnable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_BLEND);
+
+	
 
 	/////////////////////////////////////////////////////////
 
