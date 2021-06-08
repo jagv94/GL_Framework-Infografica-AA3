@@ -67,6 +67,7 @@ int bilboardsLimitDistance = 1000, billboardsOffset = 150, billboardAmount = 100
 
 //Other variables
 int gWidth, gHeight;
+float transparency = 0.5f;
 #pragma endregion
 
 ///////// fw decl
@@ -536,7 +537,7 @@ void GLrender(float dt) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (activateStencil) {
-		camaro2.draw();
+		camaro2.draw(transparency);
 	}
 
 	glStencilMask(0xFF);
@@ -570,6 +571,8 @@ void GUI() {
 			activateStencil = !activateStencil;
 			changeCamera = !changeCamera;
 		}
+
+		ImGui::DragFloat("Transparencia cristales", &transparency, 0.005f, 0.0f, 1.0f);
 
 		if (ImGui::CollapsingHeader("Iluminacion")) {
 			ImGui::Indent();

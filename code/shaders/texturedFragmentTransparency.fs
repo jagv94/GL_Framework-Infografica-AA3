@@ -18,6 +18,7 @@
 	uniform float specularDensity; //Densidad especular
 	uniform int lightSelection; //Selector del tipo de iluminacion (direccional o point)
 	uniform sampler2D ourTexture;
+	uniform float myAplha;
 	vec4 posCamera; //Posición de la camara
 	vec4 resultOfAll;
 	vec3 result; //Resultado de las operaciones
@@ -49,5 +50,5 @@
 		out_Color = vec4(result, 1.0);
 		resultOfAll = texture(ourTexture, TexCoord) * out_Color;
 		
-		FragColor = vec4(resultOfAll.x,resultOfAll.y, resultOfAll.z, 0.5f);
+		FragColor = vec4(resultOfAll.x,resultOfAll.y, resultOfAll.z, myAplha);
 	}

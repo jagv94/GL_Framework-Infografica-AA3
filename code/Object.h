@@ -65,6 +65,7 @@ public:
 
 	void draw();
 	void draw(unsigned int _framebuffer);
+	void draw(float _alphaValue);
 	void update(const glm::mat4& transform);
 	void cleanup();
 };
