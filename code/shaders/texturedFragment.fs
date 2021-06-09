@@ -30,7 +30,7 @@
 		vec4 diffuse = (difuseColor * difuseIntensity * max(dot(vert_Normal, normalize(lightDirection)), 0.0));
 
 		//specular (dot de direccion de la camara respecto la cara del objeto)
-		vec4 specular = ((pow(max(dot(normalize(posCamera - fragPos), reflect(-lightDirection, vert_Normal)), 0.0), specularDensity)) * specularIntensity * specularColor);
+		vec4 specular = ((pow(max(dot(normalize(posCamera - fragPos), normalize(reflect(-lightDirection, vert_Normal))), 0.0), specularDensity)) * specularIntensity * specularColor);
 
 		//Sumamos las anteriores operaciones y finalmente multiplicamos por el color original del objeto
 		result = vec3((ambient + diffuse + specular) * objectColor);
