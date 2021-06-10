@@ -20,14 +20,14 @@
 	vec4 posCamera; //Posición de la camara
 	vec3 result; //Resultado de las operaciones
 	void main() {
-		lightDirection = directional_light; //Asignamos la dirección de la luz como de directional light
+		lightDirection = normalize(directional_light); //Asignamos la dirección de la luz como de directional light. La enviamos ya normalizada.
 
 		posCamera = inverse(mv_Mat)[3]; //Obtenemos la posición de la cámara de la inversa de matrix view
 		//luz ambiente (color ambiente * intensidad ambiente)
 		vec4 ambient = (ambientColor * ambientIntensity);
 
 		//luz difusa (color luz difusa * intensidas luz difusa * dot de (normal objeto y direccion de la luz)
-		vec4 diffuse = (difuseColor * difuseIntensity * max(dot(vert_Normal, normalize(lightDirection)), 0.0));
+		vec4 diffuse = (difuseColor * difuseIntensity * max(dot(vert_Normal, lightDirection), 0.0));
 
 		//specular (dot de direccion de la camara respecto la cara del objeto)
 		vec4 specular = ((pow(max(dot(normalize(posCamera - fragPos), normalize(reflect(-lightDirection, vert_Normal))), 0.0), specularDensity)) * specularIntensity * specularColor);

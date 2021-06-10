@@ -22,24 +22,14 @@
 	vec3 result; //Resultado de las operaciones
 	void main() {
 		FragColor = texture(ourTexture, TexCoord);
-		switch(lightSelection){ //Switch para la selección de iluminación
-			case 0:
-				lightDirection = directional_light; //Asignamos la dirección de la luz como de directional light
-				break;
-			case 1:
-				lightDirection = normalize(pointLight_pos - fragPos); //Asignamos la dirección de la luz como la de la point light
-				break;
-			default:
-				lightDirection = directional_light; //Asignamos la dirección de la luz como de directional light
-				break;
-		}
+		lightDirection = normalize(directional_light); //Asignamos la dirección de la luz como de directional light. La enviamos ya normalizada.
 
 		posCamera = inverse(mv_Mat)[3]; //Obtenemos la posición de la cámara de la inversa de matrix view
 		//luz ambiente (color ambiente * intensidad ambiente)
 		vec4 ambient = (ambientColor * ambientIntensity);
 
 		//luz difusa (color luz difusa * intensidas luz difusa * dot de (normal objeto y direccion de la luz)
-		vec4 diffuse = (difuseColor * difuseIntensity * max(dot(normalize(vert_Normal), normalize(lightDirection)), 0.0));
+		vec4 diffuse = (difuseColor * difuseIntensity * max(dot(vert_Normal, lightDirection), 0.0));
 
 		//specular (dot de direccion de la camara respecto la cara del objeto)
 		vec4 specular = ((pow(max(dot(normalize(posCamera - fragPos), reflect(-lightDirection, normalize(vert_Normal))), 0.0), specularDensity)) * specularIntensity * specularColor);
